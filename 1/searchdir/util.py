@@ -5,12 +5,14 @@
 
 from operator import attrgetter
 from collections import deque
+import heapq
 
 #Queue - Implementation of the data structure Queue
 class Queue:
     # initializes the current data structure
     def __init__(self):
         self.__elems = deque()
+        self.__length = 0
 
     # returns the elements of the current data structure
     def show(self):
@@ -18,19 +20,24 @@ class Queue:
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-        return not self.__elems
+        return self.__length == 0
 
     # add the element item to the current data structure
     def enqueue(self, item):
         self.__elems.append(item)
+        self.__length += 1
 
     # removes an element from the current data structure
     def dequeue(self):
+        if self.isEmpty():
+            return None
+
+        self.__length -= 1
         return self.__elems.popleft()
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-        return len(self.__elems)
+        return self.__length
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
@@ -41,31 +48,36 @@ class Queue:
 class PriorityQueue:
     # initializes the data structure
     def __init__(self, fct):
-    # TO COMPLETE
+        self.__heap = []
+        self.__length = 0
 
     # returns the elements of the current data structure
     def show(self):
-    # TO COMPLETE
+        return self.__heap
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-    # TO COMPLETE
+        return self.__length == 0
 
     # add the element item to the current data structure
     def enqueue(self, item):
-    # TO COMPLETE
-
+        heapq.heappush(self.__heap, item)
+        self.__length += 1
     # removes an element from the current data structure
     def dequeue(self):
-    # TO COMPLETE
+        if self.isEmpty():
+            return None
+        
+        self.__length -= 1
+        return heapq.heappop(self.__heap)
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-    # TO COMPLETE
+        return self.__length
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
-    # TO COMPLETE
+        return item in self.__heap
 
 #Stack - Implementation of the data structure Stack
 class Stack:
