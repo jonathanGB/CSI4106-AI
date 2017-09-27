@@ -4,37 +4,37 @@
 ###habdi.cnlp@gmail.com
 
 from operator import attrgetter
+from collections import deque
 
 #Queue - Implementation of the data structure Queue
 class Queue:
     # initializes the current data structure
     def __init__(self):
-    # TO COMPLETE
-
+        self.elems = deque()
 
     # returns the elements of the current data structure
     def show(self):
-    # TO COMPLETE
+        return self.elems
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-    # TO COMPLETE
+        return not self.elems
 
     # add the element item to the current data structure
     def enqueue(self, item):
-    # TO COMPLETE
+        self.elems.append(item)
 
     # removes an element from the current data structure
     def dequeue(self):
-    # TO COMPLETE
+        return self.elems.popleft()
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-    # TO COMPLETE
+        return len(self.elems)
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
-    # TO COMPLETE
+        return item in self.elems
 
 
 #Priority Queue Implementation of the data structure PriorityQueue
