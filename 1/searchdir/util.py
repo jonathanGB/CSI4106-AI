@@ -78,7 +78,6 @@ class Stack:
     # initializes the data structure
     def __init__(self):
         self.__list = []
-        self.__length = 0
 
     # returns the elements of the current data structure
     def show(self):
@@ -86,24 +85,22 @@ class Stack:
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-        return self.__length == 0
+        return not self.__list
 
     # add the element item to the current data structure
     def push(self, item):
         self.__list.append(item)
-        self.__length += 1
 
     # removes an element from the current data structure
     def pop(self):
         if self.isEmpty():
             return None
 
-        self.__length -= 1
         return self.__list.pop()
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-        return self.__length
+        return len(self.__list)
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
