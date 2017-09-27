@@ -10,31 +10,31 @@ from collections import deque
 class Queue:
     # initializes the current data structure
     def __init__(self):
-        self.elems = deque()
+        self.__elems = deque()
 
     # returns the elements of the current data structure
     def show(self):
-        return self.elems
+        return self.__elems
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-        return not self.elems
+        return not self.__elems
 
     # add the element item to the current data structure
     def enqueue(self, item):
-        self.elems.append(item)
+        self.__elems.append(item)
 
     # removes an element from the current data structure
     def dequeue(self):
-        return self.elems.popleft()
+        return self.__elems.popleft()
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-        return len(self.elems)
+        return len(self.__elems)
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
-        return item in self.elems
+        return item in self.__elems
 
 
 #Priority Queue Implementation of the data structure PriorityQueue
