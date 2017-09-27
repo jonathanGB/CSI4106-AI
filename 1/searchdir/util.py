@@ -46,6 +46,7 @@ class PriorityQueue:
     # initializes the data structure
     def __init__(self, fct):
         self.__heap = []
+        self.__priority = fct
 
     # returns the elements of the current data structure
     def show(self):
@@ -57,7 +58,7 @@ class PriorityQueue:
 
     # add the element item to the current data structure
     def enqueue(self, item):
-        heapq.heappush(self.__heap, item)
+        heapq.heappush(self.__heap, (self.__priority(item), item))
 
     # removes an element from the current data structure
     def dequeue(self):
