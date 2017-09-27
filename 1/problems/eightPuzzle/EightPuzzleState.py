@@ -38,7 +38,7 @@ class EightPuzzleState(State):
 
     # returns true if the current state is the same as other, false otherwise
     def equals(self, other):
-        return self.numbers = other.numbers
+        return self.numbers == other.numbers
 
 
     # prints the grid representing the current state
