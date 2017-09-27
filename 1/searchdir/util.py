@@ -12,7 +12,6 @@ class Queue:
     # initializes the current data structure
     def __init__(self):
         self.__elems = deque()
-        self.__length = 0
 
     # returns the elements of the current data structure
     def show(self):
@@ -20,24 +19,22 @@ class Queue:
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-        return self.__length == 0
+        return not self.__elems
 
     # add the element item to the current data structure
     def enqueue(self, item):
         self.__elems.append(item)
-        self.__length += 1
 
     # removes an element from the current data structure
     def dequeue(self):
         if self.isEmpty():
             return None
 
-        self.__length -= 1
         return self.__elems.popleft()
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-        return self.__length
+        return len(self.__elems)
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
@@ -49,7 +46,6 @@ class PriorityQueue:
     # initializes the data structure
     def __init__(self, fct):
         self.__heap = []
-        self.__length = 0
 
     # returns the elements of the current data structure
     def show(self):
@@ -57,23 +53,21 @@ class PriorityQueue:
 
     # returns a boolean indicating whether the current data structure is empty or not
     def isEmpty(self):
-        return self.__length == 0
+        return not self.__heap
 
     # add the element item to the current data structure
     def enqueue(self, item):
         heapq.heappush(self.__heap, item)
-        self.__length += 1
+
     # removes an element from the current data structure
     def dequeue(self):
         if self.isEmpty():
             return None
-        
-        self.__length -= 1
         return heapq.heappop(self.__heap)
 
     # returns the size of the current data structure (the number of elements)
     def size(self):
-        return self.__length
+        return len(self.__heap)
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
