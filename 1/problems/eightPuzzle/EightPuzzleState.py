@@ -17,13 +17,13 @@ class EightPuzzleState(State):
 
     #initializes the eight puzzle with the configuration passed in parameter (numbers)
     def __init__(self, numbers):
-       # TO COMPLETE
+        self.numbers = numbers
 
 
 
     #returns a boolean value that indicates if the current configuration is the same as the goal configuration
     def isGoal(self):
-        # TO COMPLETE
+        return self.numbers == EightPuzzleState.goal
 
 
     # returns the set of legal actions in the current state
@@ -38,7 +38,7 @@ class EightPuzzleState(State):
 
     # returns true if the current state is the same as other, false otherwise
     def equals(self, other):
-    # TO COMPLETE
+        return self.numbers = other.numbers
 
 
     # prints the grid representing the current state
@@ -50,8 +50,17 @@ class EightPuzzleState(State):
         # | 6 | 7 | 8 |
         # -----------
     def show(self):
-    # TO COMPLETE
+        for i in range(0, 9):
+            if i % 3 == 0:
+                print("\n ----------- \n|", end='')
 
+            val = str(self.numbers[i])
+            if val == "0":
+                val = " "
+
+            print(" " + val + " |", end='')
+
+        print("\n ----------- \n", end='')
     # returns the cost of the action in parameter
     def cost(self, action):
     # TO COMPLETE
@@ -74,6 +83,7 @@ class EightPuzzleState(State):
     def heuristic2(self, matrix, goal):
         # TO COMPLETE
 
+EightPuzzleState.goal = [0,1,2,3,4,5,6,7,8]
 
 ####################### SOLVABILITY ###########################
 
