@@ -6,28 +6,25 @@ from searchdir.util import *
 def depthfirst_search(initialState):
     print('DFS ----------------------------------')
     root = Node(initialState)
+    toVisit = Stack()
+    toVisit.push(root)
 
-    return depthfirst_search_rec(root)
+    return depthfirst_search_rec(toVisit)
 
-def depthfirst_search_rec(node, visitedCtr=0):
+def depthfirst_search_rec(toVisit, visitedCtr=0):
+    if toVisit.isEmpty():
+        return None, visitedCtr
+
+    node = toVisit.pop()
     visitedCtr += 1
 
     if node.state.isGoal():
         return node, visitedCtr
 
     if node.isRepeated():
-        return None, visitedCtr
+        return depthfirst_search_rec(toVisit, visitedCtr)
 
-    frontier = Stack()
     for expanded in node.expand():
-        frontier.push(expanded)
+        toVisit.push(expanded)
 
-    while not frontier.isEmpty():
-        expanded = frontier.pop()
-        solution, subCtr = depthfirst_search_rec(expanded, visitedCtr)
-        visitedCtr += subCtr
-
-        if solution:
-            return expanded, visitedCtr
-
-    return None, visitedCtr
+    return depthfirst_search_rec(toVisit, visitedCtr)
