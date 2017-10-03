@@ -3,6 +3,9 @@
 ## Author: Hadi Abdi Ghavidel
 ## habdi.cnlp@gmail.com
 
+import sys
+sys.path.insert(0, "../..")
+
 import timeit
 
 import numpy as np
