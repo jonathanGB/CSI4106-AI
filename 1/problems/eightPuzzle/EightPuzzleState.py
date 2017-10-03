@@ -21,7 +21,7 @@ class EightPuzzleState(State):
     #initializes the eight puzzle with the configuration passed in parameter (numbers)
     def __init__(self, numbers):
         self.numbers = numbers
-        self.empty_tile = 0      #index of the '0' tile
+        self.empty_tile = numbers.index(0)
 
 
 
@@ -32,11 +32,14 @@ class EightPuzzleState(State):
 
     # returns the set of legal actions in the current state
     def possibleActions(self):
-        # initialize list with indexes to the left, right, top, and bottom of the empty tile index respectively
-        possible_actions = [self.empty_tile - 1, self.empty_tile + 1, self.empty_tile - 3, self.empty_tile + 3]
+        possible_actions = [self.empty_tile + 3, self.empty_tile - 3]
+        if not self.empty_tile % 3 == 0:
+            possible_actions.append(self.empty_tile - 1)
+        if not (self.empty_tile + 1) % 3 == 0:
+            possible_actions.append(self.empty_tile + 1)
         
-        # filter out invalid actions
         actions = [action for action in possible_actions if action >= 0 and action <= 8]
+
         return actions
 
     # applies the result of the move on the current state
