@@ -18,6 +18,7 @@ class EightPuzzleState(State):
     #initializes the eight puzzle with the configuration passed in parameter (numbers)
     def __init__(self, numbers):
         self.numbers = numbers
+        self.empty_tile = 0      #index of the '0' tile
 
 
 
@@ -28,12 +29,18 @@ class EightPuzzleState(State):
 
     # returns the set of legal actions in the current state
     def possibleActions(self):
-         # TO COMPLETE
-
+        # initialize list with indexes to the left, right, top, and bottom of the empty tile index respectively
+        possible_actions = [self.empty_tile - 1, self.empty_tile + 1, self.empty_tile - 3, self.empty_tile + 3]
+        
+        # filter out invalid actions
+        actions = [action for action in possible_actions if action >= 0 and action <= 8]
+        return actions
 
     # applies the result of the move on the current state
     def executeAction(self, move):
-        # TO COMPLETE
+        self.numbers[self.empty_tile] = self.numbers[move]
+        self.numbers[move] = 0
+        self.empty_tile = move
 
 
     # returns true if the current state is the same as other, false otherwise
@@ -63,7 +70,7 @@ class EightPuzzleState(State):
         print("\n ----------- \n", end='')
     # returns the cost of the action in parameter
     def cost(self, action):
-    # TO COMPLETE
+        return 1
 
     # returns the value of the heuristic for the current state
     # note that you can alternatively call heuristic1() and heuristic2() to test both heuristics with A*
