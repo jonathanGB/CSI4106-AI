@@ -93,8 +93,15 @@ class EightPuzzleState(State):
 
     ## returns the value of your first heuristic for the current state
     # make sure to explain it clearly in your comment
+    # how many pairs misplaced
     def heuristic1(self):
-        pass# TO COMPLETE
+        ctr = 0
+
+        for i, number in enumerate(self.numbers):
+            if not EightPuzzleState.goal[i] == number:
+                ctr += 1
+
+        return ctr / 2.0
 
 
     # returns the value of your first heuristic for the current state
