@@ -9,21 +9,25 @@ def astar_search(initialState):
     print('A* ------------------------------------')
     root = Node(initialState)
     open_nodes = PriorityQueue(priority_function)
-    visited = {}
+    visited = set()
     open_nodes.enqueue(root)
+
     while not open_nodes.isEmpty():
         current = open_nodes.dequeue()[2]
+        currentHash = current.state.toString()
 
         if current.state.isGoal():
             return current, len(visited)
 
-        visited[current.state.toString()] = True
+        if currentHash in visited:
+            continue
+
+        visited.add(currentHash)
 
         for neighbor in current.expand():
-            if neighbor.state.toString() in visited:
-                continue
-
             open_nodes.enqueue(neighbor)
+
+    return None, len(visited)
 
 def priority_function(node):
     return node.f
