@@ -120,6 +120,9 @@ class EightPuzzleState(State):
         return ctr / 2
 
 
+    def toString(self):
+        return ''.join(map(str, self.numbers))
+
 EightPuzzleState.goal = [0,1,2,3,4,5,6,7,8]
 
 ####################### SOLVABILITY ###########################
@@ -139,21 +142,18 @@ def inversions(s):
     )
 
 def randomize(puzzle):
-    puzzle = puzzle.shuffle_ran(puzzle, 1)
-    puzzle_choice = []
-    for sublist in puzzle.cells:
-        for item in sublist:
-            puzzle_choice.append(item)
-    return puzzle, puzzle_choice
+    puzzle = shuffle_ran(puzzle, 1)
 
-    def shuffle_ran(self,board, moves):
-        newState = board
-        if moves==100:
-            return newState
-        else:
-            newState.executeAction(random.choice(list(board.possibleActions())))
-            moves= moves+1
-            return self.shuffle_ran(newState, moves)
+    return puzzle, puzzle.numbers
+
+def shuffle_ran(board, moves):
+    newState = board
+    if moves==100:
+        return newState
+    else:
+        newState.executeAction(random.choice(list(board.possibleActions())))
+        moves= moves+1
+        return shuffle_ran(newState, moves)
 
 #######  SEARCH ###########################
 EIGHT_PUZZLE_DATA = [[0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -184,9 +184,9 @@ else:
     stop = timeit.default_timer()
     printResults('DFS', solution, start, stop, nbvisited)
 
-   # start = timeit.default_timer()
-    #solution, nbvisited = astar_search(puzzle)
-    #stop = timeit.default_timer()
-    #printResults('A*', solution, start, stop, nbvisited)
+    start = timeit.default_timer()
+    solution, nbvisited = astar_search(puzzle)
+    stop = timeit.default_timer()
+    printResults('A*', solution, start, stop, nbvisited)
 
 
