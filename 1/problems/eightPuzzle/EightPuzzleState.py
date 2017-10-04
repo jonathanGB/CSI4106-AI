@@ -29,22 +29,28 @@ class EightPuzzleState(State):
 
     # returns the set of legal actions in the current state
     def possibleActions(self):
-        possible_actions = [self.empty_tile + 3, self.empty_tile - 3]
+        possible_actions = [(self.empty_tile + 3, "down"), (self.empty_tile - 3, "up")]
         if not self.empty_tile % 3 == 0:
-            possible_actions.append(self.empty_tile - 1)
+            possible_actions.append((self.empty_tile - 1, "left"))
         if not (self.empty_tile + 1) % 3 == 0:
-            possible_actions.append(self.empty_tile + 1)
+            possible_actions.append((self.empty_tile + 1, "right"))
         
-        actions = [action for action in possible_actions if action >= 0 and action <= 8]
+        actions = [action[1] for action in possible_actions if action[0] >= 0 and action[0] <= 8]
 
         return actions
 
     # applies the result of the move on the current state
     def executeAction(self, move):
-        self.numbers[self.empty_tile] = self.numbers[move]
-        self.numbers[move] = 0
-        self.empty_tile = move
-
+        move_indices = {
+            "down": self.empty_tile + 3,
+            "up": self.empty_tile - 3,
+            "left": self.empty_tile - 1,
+            "right": self.empty_tile + 1
+        }
+        move_index = move_indices[move]
+        self.numbers[self.empty_tile] = self.numbers[move_index]
+        self.numbers[move_index] = 0
+        self.empty_tile = move_index
 
     # returns true if the current state is the same as other, false otherwise
     def equals(self, other):
