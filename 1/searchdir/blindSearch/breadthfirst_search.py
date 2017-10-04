@@ -6,21 +6,21 @@ from searchdir.util import *
 def breadthfirst_search(initialState):
     print('BFS------------------------------')
     root = Node(initialState)
-    visitedCtr = 0
+    visited = {}
     toVisit = Queue()
     toVisit.enqueue(root)
 
     while not toVisit.isEmpty():
         node = toVisit.dequeue()
-        visitedCtr += 1
 
         if node.state.isGoal():
-            return node, visitedCtr
+            return node, len(visited)
 
-        if node.isRepeated():
-            continue
+        visited[node.state.toString()] = True
 
         for expanded in node.expand():
+            if expanded.state.toString() in visited:
+                continue
             toVisit.enqueue(expanded)
 
     return None, visitedCtr

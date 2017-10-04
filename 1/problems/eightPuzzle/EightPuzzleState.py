@@ -102,6 +102,9 @@ class EightPuzzleState(State):
     def heuristic2(self, matrix, goal):
         pass# TO COMPLETE
 
+    def toString(self):
+        return ''.join(map(str, self.numbers))
+
 EightPuzzleState.goal = [0,1,2,3,4,5,6,7,8]
 
 ####################### SOLVABILITY ###########################
