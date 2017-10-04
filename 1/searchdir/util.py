@@ -74,6 +74,10 @@ class PriorityQueue:
     def __contains__(self, item):
         return item in self.__heap
 
+    def remove(self, item):
+        self.__heap.remove(item)
+        heapq.heapify(self.__heap)
+
 #Stack - Implementation of the data structure Stack
 class Stack:
     # initializes the data structure
