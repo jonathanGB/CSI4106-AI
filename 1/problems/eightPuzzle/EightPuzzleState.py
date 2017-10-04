@@ -101,13 +101,24 @@ class EightPuzzleState(State):
             if not EightPuzzleState.goal[i] == number:
                 ctr += 1
 
-        return ctr / 2.0
+        return ctr / 2
 
 
     # returns the value of your first heuristic for the current state
     # make sure to explain it clearly in your comment
-    def heuristic2(self, matrix, goal):
-        pass# TO COMPLETE
+    # manhattan distance
+    def heuristic2(self):
+        ctr = 0
+
+        for i, number in enumerate(self.numbers):
+            # number is equal to the index it's supposed to be at
+            xDelta = abs((number % 3) - (i % 3))
+            yDelta = abs((number // 3) - (i // 3))
+
+            ctr += xDelta + yDelta
+
+        return ctr / 2
+
 
 EightPuzzleState.goal = [0,1,2,3,4,5,6,7,8]
 
