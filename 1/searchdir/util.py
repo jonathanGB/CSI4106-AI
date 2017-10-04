@@ -47,6 +47,7 @@ class PriorityQueue:
     def __init__(self, fct):
         self.__heap = []
         self.__priority = fct
+        self.__ctr = 0
 
     # returns the elements of the current data structure
     def show(self):
@@ -58,7 +59,8 @@ class PriorityQueue:
 
     # add the element item to the current data structure
     def enqueue(self, item):
-        heapq.heappush(self.__heap, (self.__priority(item), item))
+        self.__ctr += 1
+        heapq.heappush(self.__heap, (self.__priority(item), self.__ctr, item))
 
     # removes an element from the current data structure
     def dequeue(self):
@@ -72,11 +74,11 @@ class PriorityQueue:
 
     # returns a boolean value that indicates if the element item is contained in the current data structure
     def __contains__(self, item):
-        return item in self.__heap
+        for heap_item in self.__heap:
+            if heap_item[2] == item:
+                return True
+        return False
 
-    def remove(self, item):
-        self.__heap.remove(item)
-        heapq.heapify(self.__heap)
 
 #Stack - Implementation of the data structure Stack
 class Stack:
