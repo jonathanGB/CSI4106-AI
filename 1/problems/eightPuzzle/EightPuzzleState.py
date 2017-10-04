@@ -87,20 +87,38 @@ class EightPuzzleState(State):
     # returns the value of the heuristic for the current state
     # note that you can alternatively call heuristic1() and heuristic2() to test both heuristics with A*
     def heuristic(self):
-        return self.heuristic1()
+        return self.heuristic2()
         # return self.heuristic2()
 
 
     ## returns the value of your first heuristic for the current state
     # make sure to explain it clearly in your comment
+    # how many pairs misplaced
     def heuristic1(self):
-        pass# TO COMPLETE
+        ctr = 0
+
+        for i, number in enumerate(self.numbers):
+            if not EightPuzzleState.goal[i] == number:
+                ctr += 1
+
+        return ctr / 2
 
 
     # returns the value of your first heuristic for the current state
     # make sure to explain it clearly in your comment
-    def heuristic2(self, matrix, goal):
-        pass# TO COMPLETE
+    # manhattan distance
+    def heuristic2(self):
+        ctr = 0
+
+        for i, number in enumerate(self.numbers):
+            # number is equal to the index it's supposed to be at
+            xDelta = abs((number % 3) - (i % 3))
+            yDelta = abs((number // 3) - (i // 3))
+
+            ctr += xDelta + yDelta
+
+        return ctr / 2
+
 
     def toString(self):
         return ''.join(map(str, self.numbers))
