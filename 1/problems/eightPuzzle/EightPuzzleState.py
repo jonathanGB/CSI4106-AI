@@ -3,6 +3,9 @@
 ## Author: Hadi Abdi Ghavidel
 ## habdi.cnlp@gmail.com
 
+import sys
+sys.path.insert(0, "../..")
+
 import timeit
 
 import numpy as np
@@ -91,13 +94,13 @@ class EightPuzzleState(State):
     ## returns the value of your first heuristic for the current state
     # make sure to explain it clearly in your comment
     def heuristic1(self):
-        # TO COMPLETE
+        pass# TO COMPLETE
 
 
     # returns the value of your first heuristic for the current state
     # make sure to explain it clearly in your comment
     def heuristic2(self, matrix, goal):
-        # TO COMPLETE
+        pass# TO COMPLETE
 
 EightPuzzleState.goal = [0,1,2,3,4,5,6,7,8]
 
@@ -163,9 +166,9 @@ else:
     stop = timeit.default_timer()
     printResults('DFS', solution, start, stop, nbvisited)
 
-    start = timeit.default_timer()
-    solution, nbvisited = astar_search(puzzle)
-    stop = timeit.default_timer()
-    printResults('A*', solution, start, stop, nbvisited)
+   # start = timeit.default_timer()
+    #solution, nbvisited = astar_search(puzzle)
+    #stop = timeit.default_timer()
+    #printResults('A*', solution, start, stop, nbvisited)
 
 
