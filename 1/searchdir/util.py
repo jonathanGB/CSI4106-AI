@@ -119,7 +119,11 @@ def printResults(alg, solution, start, stop, nbvisited):
     try:
         result, depth = solution.extractSolutionAndDepth()
         if result != []:
-            print("The Solution is  ", (result))
+            if len(result) > 200:
+                print("The solution is  {}\n............\n{}".format(result[:100], result[-100:]))
+            else:
+                print("The Solution is  ", (result))
+
             print("The Solution is at depth ", depth)
             print("The path cost is ", solution.getcost())
             print('Number of visited nodes:', nbvisited)
