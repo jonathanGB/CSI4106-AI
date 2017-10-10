@@ -41,7 +41,7 @@ The real cost in our case is a cost of 1 per move (3 swaps = cost of 3, etc.)
 
 **Heuristics 1**: With a real cost of *x*, we know that we must do exactly *x* moves to get to the goal state. With 1 move, 2 numbers have moved from their original position (0 and a neighbour); with a second move, another number can be displaced (we don't include 0 as it is already displaced), and so on. So, with *x* moves (read "real cost of *x*"), we can displace **at least** *x+1* numbers. Knowing that, if we compute that *y* numbers are misplaced | y > 0, we know we can move these *y* numbers in **at least** *y-1* moves, so has a minimum real cost of *y-1*. Therefore, **Heuristics 1** is admissible as it is certain to never overcome the minimum real cost at one state.
 
-**Heuristics 2**:
+**Heuristics 2**: The Manhattan distance of a number to its goal position is really the number of moves required to get to that position. However, the sum of all Manhattan distances will lead to some redundancy, because a single move can reduce the distance of 2 numbers at once. If we push this case to the extreme, it is possible that every move will reduce the distance of 2 nodes at once, therefore we know that the minimum number of moves (real cost) is half the sum of all Manhattan distances. Therefore, **Heuristics 2** is admissible because it divides the sum of all Manhattan distances by 2, which is certain to never overcome the minimum real cost at one state.
 
 
 **c. Does one heuristic dominate the other?**
@@ -53,16 +53,16 @@ No, as none of the heuristics always have a higher score than the other. Here's 
 | 3 | 4 | 2 |
 | 7 | 0 | 8 |
 
-Heuristics 1: 5 <br>
-Heuristics 2: 6
+Cost of Heuristics 1: 5 <br>
+Cost of Heuristics 2: 6
 
 | 1 | 4 | 2 |
 |---|---|---|
 | 0 | 8 | 5 |
 | 3 | 7 | 6 |
 
-Heuristics 1: 5 <br>
-Heuristics 2: 4
+Cost of Heuristics 1: 5 <br>
+Cost of Heuristics 2: 4
 
 
 In the first case, **heuristics 2** dominates **heuristics 1**; in the second case, **heuristics 1** dominates **heuristics 2**. Therefore, none of them are dominant.
