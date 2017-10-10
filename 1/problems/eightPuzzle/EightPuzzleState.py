@@ -86,9 +86,9 @@ class EightPuzzleState(State):
 
     # returns the value of the heuristic for the current state
     # note that you can alternatively call heuristic1() and heuristic2() to test both heuristics with A*
+    # we simply put heuristics2 (manhattan distance) as it dominates heuristics1
     def heuristic(self):
         return self.heuristic2()
-        # return self.heuristic2()
 
 
     ## returns the value of your first heuristic for the current state
@@ -97,10 +97,13 @@ class EightPuzzleState(State):
     def heuristic1(self):
         ctr = 0
 
+        # count how many numbers are misplaced compared to the goal state
         for i, number in enumerate(self.numbers):
             if not EightPuzzleState.goal[i] == number:
                 ctr += 1
 
+        # we divide by two to make sure the heuristics cost <= real cost
+        # e.g. with [1,0,2,3,4,5,6,7,8], there are 2 numbers misplaced but the real cost is 1 swap
         return ctr / 2
 
 
@@ -111,18 +114,21 @@ class EightPuzzleState(State):
         ctr = 0
 
         for i, number in enumerate(self.numbers):
-            # number is equal to the index it's supposed to be at
-            xDelta = abs((number % 3) - (i % 3))
-            yDelta = abs((number // 3) - (i // 3))
+            # number is equal to the index it's supposed to be at in the goal state (number 0 at index 0, etc.)
+            xDelta = abs((number % 3) - (i % 3)) # distance of the number horizontally to its goal
+            yDelta = abs((number // 3) - (i // 3)) # distance of the number vertically to its goal
 
             ctr += xDelta + yDelta
 
+        # we divide by two to make sure the heuristics cost <= real cost
+        # e.g. with [1,0,2,3,4,5,6,7,8], "0" and "1" are at distance 1, for a total of 2, but the real cost is 1 swap
         return ctr / 2
 
-
+    # turn array into string so we can store it in a set (to keep track of visited states)
     def toString(self):
         return ''.join(map(str, self.numbers))
 
+# static variable of the goal state
 EightPuzzleState.goal = [0,1,2,3,4,5,6,7,8]
 
 ####################### SOLVABILITY ###########################

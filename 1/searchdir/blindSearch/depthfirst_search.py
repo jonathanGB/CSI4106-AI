@@ -6,13 +6,13 @@ from searchdir.util import *
 def depthfirst_search(initialState):
     print('DFS ----------------------------------')
     root = Node(initialState)
-    visited = set()
+    visited = set() # keep track of visited nodes
     toVisit = Stack()
     toVisit.push(root)
 
     while not toVisit.isEmpty():
         node = toVisit.pop()
-        nodeHash = node.state.toString()
+        nodeHash = node.state.toString() # stored in the set of visited nodes
 
         if node.state.isGoal():
             return node, len(visited)
