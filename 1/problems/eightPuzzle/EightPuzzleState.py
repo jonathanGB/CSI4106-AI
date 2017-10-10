@@ -33,26 +33,37 @@ class EightPuzzleState(State):
     # returns the set of legal actions in the current state
     def possibleActions(self):
         possible_actions = [(self.empty_tile + 3, "down"), (self.empty_tile - 3, "up")]
+        # if the empty tile is not in the leftmost column (indices 0, 3, 6), it may swap left
         if not self.empty_tile % 3 == 0:
             possible_actions.append((self.empty_tile - 1, "left"))
+
+        # if the empty tile is not in the rightmost column (indices 2, 5, 8, it may swap right
         if not (self.empty_tile + 1) % 3 == 0:
             possible_actions.append((self.empty_tile + 1, "right"))
         
+        # filter out actions with invalid tile indices and take only the text value of the action
         actions = [action[1] for action in possible_actions if action[0] >= 0 and action[0] <= 8]
 
         return actions
 
     # applies the result of the move on the current state
     def executeAction(self, move):
+        # indices of the possible tiles to swap with
         move_indices = {
             "down": self.empty_tile + 3,
             "up": self.empty_tile - 3,
             "left": self.empty_tile - 1,
             "right": self.empty_tile + 1
         }
+
+        # index of the tile to swap with
         move_index = move_indices[move]
+
+        # swap the empty tile with the "move" tile
         self.numbers[self.empty_tile] = self.numbers[move_index]
         self.numbers[move_index] = 0
+
+        # set new index of empty tile
         self.empty_tile = move_index
 
     # returns true if the current state is the same as other, false otherwise

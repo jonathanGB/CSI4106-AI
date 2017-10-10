@@ -47,7 +47,7 @@ class PriorityQueue:
     def __init__(self, fct):
         self.__heap = []
         self.__priority = fct
-        self.__ctr = 0
+        self.__ctr = 0 # counter used to resolve cases where there are multiple items of the same priority
 
     # returns the elements of the current data structure
     def show(self):
@@ -60,6 +60,7 @@ class PriorityQueue:
     # add the element item to the current data structure
     def enqueue(self, item):
         self.__ctr += 1
+        # item stored as a triple of the form (priority, counter, item)
         heapq.heappush(self.__heap, (self.__priority(item), self.__ctr, item))
 
     # removes an element from the current data structure
