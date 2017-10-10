@@ -1,12 +1,52 @@
 # CSI4106 - Assignment 1
-## by Oliver Fei and Jonathan Guillotte-Blouin
+## by Oliver Fei (7624001) and Jonathan Guillotte-Blouin (7900293)
 
-### 1.
+### 1. Environment Properties
 
-### 2.
+* **Completely observable**: the agent always has access to the position of each tile which consists of all the pertinent information of the environment.
+
+* **Deterministic**: given a current state (arrangement of tiles) and an action (a tile swaps with the empty tile), the tile swap will always result in the same state.
+
+* **Sequential**: the choice of action will effect the next action as different actions lead to different board states which will effect the next chosen action.
+
+* **Static**: the positions of each tile do not change while the agent decides on its action.
+
+* **Discrete**: there is a finite number of ways that tiles can be arranged (thus a finite number of states) and since for each state, there can be at most 4 different actions, there is a finite number of actions.
+
+* **Mono-agent**: there is only a single agent trying to solve the eight puzzle problem.
+
+### 2. Performance of Algorithms
+|Puzzle 1 (easy)        |DFS                  |BFS              |A* H1            |A* H2            |
+|:---------------------:|:-------------------:|:---------------:|:---------------:|:---------------:|
+|Depth of solution      |29                   |1                |1                |1                |
+|Solution path cost     |29                   |1                |1                |1                |
+|Time (seconds)         |0.00282              |0.000375         |0.000240         |0.000283         |
+|Number of visited nodes|29                   |2                |1                |1                |
+|Complete/optimal       |Complete, not optimal|Complete, optimal|Complete, optimal|Complete, optimal|
+
+<br>
+
+|Puzzle 6 (medium)      |DFS                  |BFS              |A* H1            |A* H2            |
+|:---------------------:|:-------------------:|:---------------:|:---------------:|:---------------:|
+|Depth of solution      |62452                |14               |14               |14               |
+|Solution path cost     |62452                |14               |14               |14               |
+|Time (seconds)         |5.4903               |0.2648           |0.0208           |0.0211           |
+|Number of visited nodes|64792                |3334             |262              |243              |
+|Complete/optimal       |Complete, not optimal|Complete, optimal|Complete, optimal|Complete, optimal|
+
+<br>
+
+|Puzzle 3 (hard)        |DFS                  |BFS              |A* H1            |A* H2            |
+|:---------------------:|:-------------------:|:---------------:|:---------------:|:---------------:|
+|Depth of solution      |110073               |19               |19               |19               |
+|Solution path cost     |110073               |19               |19               |19               |
+|Time (seconds)         |10.0378              |2.8202           |0.2040           |0.1697           |
+|Number of visited nodes|122260               |35960            |2477             |1895             |
+|Complete/optimal       |Complete, not optimal|Complete, optimal|Complete, optimal|Complete, optimal|
+
 
 ### 3. Heuristics
-**a. Description of the two heuristics used by A***
+**a. Description of the two heuristics used by A\***
 
 **Heuristics 1** simply computes the number of misplaced numbers. Let's say we have:
 
@@ -68,3 +108,8 @@ Cost of Heuristics 2: 4
 In the first case, **heuristics 2** dominates **heuristics 1**; in the second case, **heuristics 1** dominates **heuristics 2**. Therefore, none of them are dominant.
 
 ### 4. Conclusion
+It is clear that A* is the best of the three, BFS is second; DFS is the worst, as it visits a huge number of nodes and almost always return a non-optimal solution. For example, for **puzzle #7**, it returns a solution of length 110 582, while the optimal solution is only of length 24.
+
+The extra computational cost of having to calculate heuristics in A* is worthwhile; this drastically reduces our state space. Because our heuristics are not dominating each other, we compute both for a single state and return the maximum; this approach lead to faster results than **heuristics 1** or **heuristics 2** separately.
+
+By using iterative search algorithms and relying on a set of "visited" states rather than the `isRepeated` method provided, we were able to avoid `maximum recursion depth` errors and — specifically related to `isRepeated` — speed up our algorithm (`O(1)` with a set of visited nodes rather than `O(d)` with `isRepeated`, where `d` is the maximum depth of the tree). We haven't had a case where we were not able to get *DFS* results, which was often the case before we made these changes.
