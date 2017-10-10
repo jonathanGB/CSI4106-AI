@@ -9,9 +9,9 @@
 **a. Description of the two heuristics used by A***
 
 **Heuristics 1** simply computes the number of misplaced numbers. Let's say we have:
-|   |   |   |
-|---|---|---|
+
 | 2 | 3 | 0 |
+|---|---|---|
 | 1 | 4 | 5 |
 | 6 | 7 | 8 |
 
@@ -19,9 +19,9 @@
 
 
 **Heuristics 2** computes the sum of the Manhattan distance of all numbers to their goal position. The Manhattan distance itself is the sum of the distance horizontally and of the distance vertically between two points. Let's say we have:
-|   |   |   |
-|---|---|---|
+
 | 2 | 3 | 8 |
+|---|---|---|
 | 1 | 4 | 5 |
 | 6 | 7 | 0 |
 
@@ -47,18 +47,17 @@ The real cost in our case is a cost of 1 per move (3 swaps = cost of 3, etc.)
 **c. Does one heuristic dominate the other?**
 
 No, as none of the heuristics always have a higher score than the other. Here's a proof:
-|   |   |   |
-|---|---|---|
+
 | 1 | 5 | 6 |
+|---|---|---|
 | 3 | 4 | 2 |
 | 7 | 0 | 8 |
 
 Heuristics 1: 5 <br>
 Heuristics 2: 6
 
-|   |   |   |
-|---|---|---|
 | 1 | 4 | 2 |
+|---|---|---|
 | 0 | 8 | 5 |
 | 3 | 7 | 6 |
 
