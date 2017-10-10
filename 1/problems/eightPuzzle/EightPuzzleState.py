@@ -86,9 +86,9 @@ class EightPuzzleState(State):
 
     # returns the value of the heuristic for the current state
     # note that you can alternatively call heuristic1() and heuristic2() to test both heuristics with A*
-    # we simply put heuristics2 (manhattan distance) as it dominates heuristics1
+    # we take the maximum of our two heuristics
     def heuristic(self):
-        return self.heuristic2()
+        return max(self.heuristic1(), self.heuristic2())
 
 
     ## returns the value of your first heuristic for the current state
@@ -102,9 +102,10 @@ class EightPuzzleState(State):
             if not EightPuzzleState.goal[i] == number:
                 ctr += 1
 
-        # we divide by two to make sure the heuristics cost <= real cost
+        # we substract one to make sure the heuristics cost <= real cost
         # e.g. with [1,0,2,3,4,5,6,7,8], there are 2 numbers misplaced but the real cost is 1 swap
-        return ctr / 2
+        # as well, if the cost is 0, we don't want to return -1
+        return max(ctr - 1, 0)
 
 
     # returns the value of your first heuristic for the current state
