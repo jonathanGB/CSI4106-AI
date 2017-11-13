@@ -79,5 +79,3 @@ class WumpusWorld:
       self.wumpus_kb.tell(self.sensations[i][j-1][sensation])
     if j + 1 < self.size:
       self.wumpus_kb.tell(self.sensations[i][j+1][sensation])
-
-WumpusAgent = WumpusWorld()
