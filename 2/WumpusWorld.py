@@ -1,6 +1,13 @@
 from utils import *
 from logic import *
 import random
+from enum import Enum
+
+class Directions(Enum):
+  UP = 1
+  RIGHT = 2
+  DOWN = 3
+  LEFT = 4
 
 class WumpusWorld:
   def __init__(self):
@@ -11,6 +18,7 @@ class WumpusWorld:
     self.wumpuss = [[] for _ in range(self.size)]
     self.golds = [[] for _ in range(self.size)]
     self.position = [0, 0] # position of the agent
+    self.direction = Directions.UP # defaults directions is up
 
     self.createWumpusWorld()
 

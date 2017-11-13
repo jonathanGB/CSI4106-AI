@@ -6,6 +6,8 @@
 
 We assume pits **cannot** appear on the gold **and** wumpus tiles.
 
+We assume by default that the agent faces up.
+
 We don't start at [1,1], in reality at [0,0]; simpler to reason with, as python is a 0-based index. The map looks like this:
 
 |      |       |       |      |
