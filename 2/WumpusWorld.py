@@ -50,7 +50,7 @@ class WumpusWorld:
     goldI, goldJ = self.getIandJ(gold)
     self.wumpus_kb.tell(self.golds[goldI][goldJ])
     self.updateSensation('glitter', goldI, goldJ)
-    freePositions.remove(gold) # wumpus location is not free anymore
+    freePositions.remove(gold) # gold location is not free anymore
 
     # pick pits for rest of free positions (can't be initial position, nor wumpus, nor gold)
     for ij in freePositions:
