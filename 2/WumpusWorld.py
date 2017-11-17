@@ -46,7 +46,9 @@ class WumpusWorld:
       }
 
     self._wumpusPosition = None
-    self.agentPosition = [0, 0] # position of the agent
+    self._agentDead = False
+    self._goldPickedUp = True
+    self._agentPosition = [0, 0] # position of the agent
     self.direction = Directions.RIGHT # defaults directions is up
     self._agentSensations = [False, False, False, False, False] # sensations available to the agent 
 
@@ -81,6 +83,12 @@ class WumpusWorld:
       self._rooms[pitI][pitJ].hasPit = True
       self.updateSensation(Sensations.BREEZE, True, pitI, pitJ)
 
+  def isGoldPickedUp(self):
+    return self._goldPickedUp
+
+  def isAgentDead(self):
+    return self._agentDead
+
   # given a product ixj, returns a tuple containing i and j
   def getIandJ(self, ij):
     return (ij // self._size, ij % self._size)
@@ -101,7 +109,7 @@ class WumpusWorld:
 
   # set the agent sensations to the sensations available in the room it is in
   def _updateAgentSensations(self):
-    self._agentSensations = self._rooms[self.agentPosition[0]][self.agentPosition[1]].sensations
+    self._agentSensations = self._rooms[self._agentPosition[0]][self._agentPosition[1]].sensations
 
   def getPossibleActions(self, position):
     # assuming no actions possible if the agent is in the same room as a pit or a wumpus
@@ -112,11 +120,11 @@ class WumpusWorld:
   def applyAction(self, action):
     payoff = -1
     if action == Actions.MOVE_FORWARD:
-      moveLocation = tuple(map(lambda x, y: x + y, self._moveVectors[self.direction], self.agentPosition))
+      moveLocation = tuple(map(lambda x, y: x + y, self._moveVectors[self.direction], self._agentPosition))
       if -1 in moveLocation or self._size in moveLocation:
         self._agentSensations[Sensations.BUMP] = True
       else:
-        self.agentPosition = moveLocation
+        self._agentPosition = moveLocation
         self._updateAgentSensations
         if currentRoom.hasPit or currentRoom.hasWumpus:
           payoff = -1000
@@ -128,14 +136,14 @@ class WumpusWorld:
       self.direction = (self.direction + 1) % 4
       
     elif action == Actions.GRAB_OBJECT:
-      if self._rooms[self.agentPosition[0]][self.agentPosition[1]].hasGold:
-        self._rooms[self.agentPosition[0]][self.agentPosition[1]].hasGold = False
-        self._rooms[self.agentPosition[0]][self.agentPosition[1]].sensations[Sensations.GLITTER] = False
+      if self._rooms[self._agentPosition[0]][self._agentPosition[1]].hasGold:
+        self._rooms[self._agentPosition[0]][self._agentPosition[1]].hasGold = False
+        self._rooms[self._agentPosition[0]][self._agentPosition[1]].sensations[Sensations.GLITTER] = False
         self._agentSensations[Sensations.GLITTER] = False
         payoff = 1000
 
     elif action == Actions.FIRE_ARROW:
-      wumpusDirection = tuple(map(lambda x, y: x - y, self._wumpusPosition, self.agentPosition))
+      wumpusDirection = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
       arrowDirection = self._moveVectors[self.direction]
 
       # check if the arrow will hit the wumpus
