@@ -47,7 +47,7 @@ class WumpusWorld:
 
     self._wumpusPosition = None
     self._agentDead = False
-    self._goldPickedUp = True
+    self._goldPickedUp = False
     self._agentPosition = [0, 0] # position of the agent
     self.direction = Directions.RIGHT # defaults directions is up
     self._agentSensations = [False, False, False, False, False] # sensations available to the agent 
@@ -128,6 +128,7 @@ class WumpusWorld:
         self._updateAgentSensations
         if currentRoom.hasPit or currentRoom.hasWumpus:
           payoff = -1000
+          self._agentDead = True
 
     elif action == Actions.TURN_LEFT:
       self.direction = (self.direction - 1) % 4
@@ -141,6 +142,7 @@ class WumpusWorld:
         self._rooms[self._agentPosition[0]][self._agentPosition[1]].sensations[Sensations.GLITTER] = False
         self._agentSensations[Sensations.GLITTER] = False
         payoff = 1000
+        self._goldPickedUp = True
 
     elif action == Actions.FIRE_ARROW:
       wumpusDirection = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
