@@ -6,6 +6,7 @@ class WumpusAgent:
     self.wumpus_kb = PropKB()
     self.payoff = 0
     self.position = [0,0]
+    self.plan = FIFOQueue()
 
     # expressions for the knowledge base
     self.sensations = [[] for _ in range(self.size)]
@@ -56,8 +57,8 @@ class WumpusAgent:
     return expr('(' + ' | '.join(validExpressions) + ')')
 
   def tellSensations(self, percept):
-    posX = self.position[0]
-    posY = self.position[1]
+    posX = self.world.getAgentPosition()[0]
+    posY = self.world.getAgentPosition()[1]
     for perception, perceptionValue in enumerate(percept):
       prefix = '~'
       if perceptionValue:
@@ -67,9 +68,24 @@ class WumpusAgent:
 
   def exploreWorld(self):
     while not self.world.isAgentDead() and not self.world.isGoldPickedUp():
-      # update knowledge base
-      percept = self.world.getAgentSensations()
-      self.tellSensations(percept)
+      if len(self.plan) == 0:
+        # update knowledge base
+        percept = self.world.getAgentSensations()
+        self.tellSensations(percept)
+
+        # check if we are on gold
+        posX = self.world.getAgentPosition()[0]
+        posY = self.world.getAgentPosition()[1]
+        if self.wumpus_kb.ask_if_true(self.golds[posX][posY]):
+          self.plan.append(Actions.GRAB_OBJECT)
+        else:
+          # update safety information on all fringe rooms
+
+          # select the closest safe fringe room (or just the closest if no room is safe) and plan a sequence of actions to get to it
+
+      else:
+        action = self.plan.pop()
+        payoff += self.world.applyAction(action)
 
 # start script here
 # agent = WumpusAgent()

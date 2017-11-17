@@ -83,6 +83,9 @@ class WumpusWorld:
       self._rooms[pitI][pitJ].hasPit = True
       self.updateSensation(Sensations.BREEZE, True, pitI, pitJ)
 
+  def getAgentPosition(self):
+    return self._agentPosition
+
   def isGoldPickedUp(self):
     return self._goldPickedUp
 
