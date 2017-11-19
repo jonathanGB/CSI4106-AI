@@ -176,6 +176,10 @@ class WumpusWorld:
       if wumpusDirectionUnit == arrowDirectionUnit:
         wumpusX, wumpusY = self._wumpusPosition
         self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
-        self._agentSensations[Sensations.SCREAM] = True
+
+        # scream in all rooms
+        for i in range(self.size):
+          for j in range(self.size):
+            self._rooms[i][j].sensations[Sensations.SCREAM] = True
 
       return -10
