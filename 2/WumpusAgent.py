@@ -1,6 +1,7 @@
 from utils import *
 from logic import *
 from WumpusWorld import *
+from copy import deepcopy
 
 class WumpusAgent:
   def __init__(self):
