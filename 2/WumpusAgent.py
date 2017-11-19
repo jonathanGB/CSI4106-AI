@@ -1,3 +1,5 @@
+from utils import *
+from logic import *
 from WumpusWorld import *
 
 class WumpusAgent:
