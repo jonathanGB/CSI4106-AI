@@ -59,8 +59,7 @@ class WumpusAgent:
     return expr('(' + ' | '.join(validExpressions) + ')')
 
   def tellSensations(self, percept):
-    posX = self.world.getAgentPosition()[0]
-    posY = self.world.getAgentPosition()[1]
+    posX, posY = self.world.getAgentPosition()
     for perception, perceptionValue in enumerate(percept):
       prefix = '~'
       if perceptionValue:
@@ -76,8 +75,7 @@ class WumpusAgent:
         self.tellSensations(percept)
 
         # check if we are on gold
-        posX = self.world.getAgentPosition()[0]
-        posY = self.world.getAgentPosition()[1]
+        posX, posY = self.world.getAgentPosition()
         if self.wumpus_kb.ask_if_true(self.golds[posX][posY]):
           self.plan.append(Actions.GRAB_OBJECT)
         else:
