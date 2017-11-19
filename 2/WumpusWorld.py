@@ -1,6 +1,7 @@
 import random
 from enum import Enum
 from math import sqrt
+from copy import copy, deepcopy
 
 class Directions:
   UP = 0
@@ -32,9 +33,9 @@ class Room:
 
 class WumpusWorld:
 
-  def __init__(self):
+  def __init__(self, other=None):
     self._size = 4
-    self._rooms = [[Room() for _ in range(self._size)] for _ in range(self._size)]
+    self._rooms = deepcopy(other._rooms) if other else [[Room() for _ in range(self._size)] for _ in range(self._size)]
     
     # used for applying movement to the agent
     self._moveVectors = {
@@ -44,14 +45,15 @@ class WumpusWorld:
         Directions.RIGHT: (0,0)
       }
 
-    self._wumpusPosition = None
-    self._agentDead = False
-    self._goldPickedUp = False
-    self._agentPosition = (0,0) # position of the agent
-    self.direction = Directions.RIGHT # defaults directions is right
-    self._agentSensations = [False, False, False, False, False] # sensations available to the agent 
+    self._wumpusPosition = other._wumpusPosition if other else None
+    self._agentDead = other._agentDead if other else False
+    self._goldPickedUp = other._goldPickedUp if other else False
+    self._agentPosition = other._agentPosition if other else (0,0) # position of the agent
+    self.direction = other.direction if other else Directions.RIGHT # defaults directions is right
+    self._agentSensations = copy(other._agentSensations) if other else [False, False, False, False, False] # sensations available to
 
-    self.createWumpusWorld()
+    if not other:
+      self.createWumpusWorld()
 
   def createWumpusWorld(self):
     # init
@@ -60,7 +62,7 @@ class WumpusWorld:
     # pick wumpus location (can't be initial position)
     wumpus = random.choice(freePositions)
     wumpusI, wumpusJ = self.getIandJ(wumpus)
-    self._wumpusPosition = [wumpusI, wumpusJ]
+    self._wumpusPosition = (wumpusI, wumpusJ)
     self._rooms[wumpusI][wumpusJ].hasWumpus = True
     self.updateSensation(Sensations.STENCH, True, wumpusI, wumpusJ)
     freePositions.remove(wumpus) # wumpus location is not free anymore
