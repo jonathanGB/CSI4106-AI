@@ -1,7 +1,6 @@
-from utils import *
-from logic import *
 import random
 from enum import Enum
+from math import sqrt
 
 class Directions:
   UP = 0
@@ -39,17 +38,17 @@ class WumpusWorld:
     
     # used for applying movement to the agent
     self._moveVectors = {
-        Directions.UP: [0,1],
-        Directions.LEFT: [-1,0],
-        Directions.DOWN: [0,-1],
-        Directions.RIGHT: [1,0]
+        Directions.UP: (0,1),
+        Directions.LEFT: (-1,0),
+        Directions.DOWN: (0,-1),
+        Directions.RIGHT: (0,0)
       }
 
     self._wumpusPosition = None
     self._agentDead = False
     self._goldPickedUp = False
-    self._agentPosition = [0, 0] # position of the agent
-    self.direction = Directions.RIGHT # defaults directions is up
+    self._agentPosition = (0,0) # position of the agent
+    self.direction = Directions.RIGHT # defaults directions is right
     self._agentSensations = [False, False, False, False, False] # sensations available to the agent 
 
     self.createWumpusWorld()
@@ -112,53 +111,71 @@ class WumpusWorld:
 
   # set the agent sensations to the sensations available in the room it is in
   def _updateAgentSensations(self):
-    self._agentSensations = self._rooms[self._agentPosition[0]][self._agentPosition[1]].sensations
+    agentX, agentY = self._agentPosition
+    self._agentSensations = self._rooms[agentX][agentY].sensations
 
   def getPossibleActions(self, position):
     # assuming no actions possible if the agent is in the same room as a pit or a wumpus
-    if self._rooms[position[0]][position[1]].hasPit or self._rooms[position[0]][position[1]].hasWumpus:
+    positionX, positionY = position
+    if self._rooms[positionX][positionY].hasPit or self._rooms[positionX][positionY].hasWumpus:
       return []
     return [Actions.MOVE_FORWARD, Actions.TURN_LEFT, Actions.TURN_RIGHT, Actions.GRAB_OBJECT, Actions.FIRE_ARROW]
 
+  # returns payoff of action
   def applyAction(self, action):
-    payoff = -1
     if action == Actions.MOVE_FORWARD:
       moveLocation = tuple(map(lambda x, y: x + y, self._moveVectors[self.direction], self._agentPosition))
+      
+      # if we move out of bounds in x or y
       if -1 in moveLocation or self._size in moveLocation:
         self._agentSensations[Sensations.BUMP] = True
-      else:
-        self._agentPosition = moveLocation
-        self._updateAgentSensations
-        if currentRoom.hasPit or currentRoom.hasWumpus:
-          payoff = -1000
-          self._agentDead = True
-
-    elif action == Actions.TURN_LEFT:
-      self.direction = (self.direction - 1) % 4
-
-    elif action == Actions.TURN_RIGHT:
-      self.direction = (self.direction + 1) % 4
+        return -1
       
-    elif action == Actions.GRAB_OBJECT:
-      if self._rooms[self._agentPosition[0]][self._agentPosition[1]].hasGold:
-        self._rooms[self._agentPosition[0]][self._agentPosition[1]].hasGold = False
-        self._rooms[self._agentPosition[0]][self._agentPosition[1]].sensations[Sensations.GLITTER] = False
-        self._agentSensations[Sensations.GLITTER] = False
-        payoff = 1000
-        self._goldPickedUp = True
+      # we're inbounds
+      self._agentPosition = moveLocation
+      self._updateAgentSensations()
+      moveLocationX, moveLocationY = moveLocation
+      currentRoom = self._rooms[moveLocationX][moveLocationY]
+      if currentRoom.hasPit or currentRoom.hasWumpus:
+        self._agentDead = True
 
-    elif action == Actions.FIRE_ARROW:
-      wumpusDirection = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
-      arrowDirection = self._moveVectors[self.direction]
+      return -1000 if self._agentDead else -1
 
-      # check if the arrow will hit the wumpus
-      if (arrowDirection[0] == 0 and wumpusDirection[0] == 0 and wumpusDirection[1]/arrowDirection[1] > 0) or (arrowDirection[1] == 0 and wumpusDirection[1] == 0 and wumpusDirection[0]/arrowDirection[0] > 0):
-        self.updateSensation(Sensations.STENCH, False, self._wumpusPosition[0], self._wumpusPosition[1])
-        self._updateAgentSensations()
+    if action == Actions.TURN_LEFT:
+      self.direction = (self.direction - 1) % 4
+      return -1
+
+    if action == Actions.TURN_RIGHT:
+      self.direction = (self.direction + 1) % 4
+      return -1
+      
+    if action == Actions.GRAB_OBJECT:
+      agentX, agentY = self._agentPosition
+      currentRoom = self._rooms[agentX][agentY]
+
+      if not currentRoom.hasGold:
+        return -1
+
+      # we found the gold
+      currentRoom.hasGold = False
+      currentRoom.sensations[Sensations.GLITTER] = False
+      self._goldPickedUp = True
+      return 1000
+
+    if action == Actions.FIRE_ARROW:
+      # get vector from agent to wumpus
+      wumpusDirectionX, wumpusDirectionY = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
+      # vector norm (length)
+      wumpusDirectionNorm = sqrt(wumpusDirectionX ** 2 + wumpusDirectionY ** 2)
+      # get unit vector from agent to wumpus
+      wumpusDirectionUnit = tuple(map(lambda x: x / wumpusDirectionNorm, (wumpusDirectionX, wumpusDirectionY)))
+      # get unit vector of arrow direction
+      arrowDirectionUnit = self._moveVectors[self.direction]
+
+      # check if both vectors are equal (arrow hits wumpus)
+      if wumpusDirectionUnit == arrowDirectionUnit:
+        wumpusX, wumpusY = self._wumpusPosition
+        self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
         self._agentSensations[Sensations.SCREAM] = True
-        
-      payoff = -10
 
-    return payoff
-
-world = WumpusWorld()
+      return -10
