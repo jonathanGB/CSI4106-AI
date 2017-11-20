@@ -51,7 +51,7 @@ class WumpusWorld:
     self._agentPosition = other._agentPosition if other else (0,0) # position of the agent
     self.direction = other.direction if other else Directions.RIGHT # defaults directions is right
     self._agentSensations = copy(other._agentSensations) if other else [False, False, False, False, False] # sensations available to
-
+    
     if not other:
       self.createWumpusWorld()
 
@@ -99,6 +99,9 @@ class WumpusWorld:
 
   def getAgentSensations(self):
     return self._agentSensations
+
+  def getSize(self):
+    return self._size
 
   # updates sensations surrounding tile (i,j)
   def updateSensation(self, sensation, isSensed, i, j):
@@ -180,8 +183,8 @@ class WumpusWorld:
         self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
 
         # scream in all rooms
-        for i in range(self.size):
-          for j in range(self.size):
+        for i in range(self._size):
+          for j in range(self._size):
             self._rooms[i][j].sensations[Sensations.SCREAM] = True
 
       return -10
