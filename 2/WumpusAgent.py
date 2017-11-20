@@ -7,7 +7,6 @@ class WumpusAgent:
     self.world = WumpusWorld()
     self.wumpus_kb = PropKB()
     self.payoff = 0
-    self.position = [0,0]
     self.plan = FIFOQueue()
 
     # expressions for the knowledge base
@@ -46,13 +45,13 @@ class WumpusAgent:
     if i - 1 >= 0:
       # add expression for left room
       validExpressions.append(str(expressionns[i-1][j]))
-    if i + 1 < self._size:
+    if i + 1 < self.world._size
       # add expression for right room
       validExpressions.append(str(expressions[i+1][j]))
     if j - 1 >= 0:
       # add expression for bottom room
       validExpressions.append(str(expressions[i][j-1]))
-    if j + 1 < self._size:
+    if j + 1 < self.world._size:
       # add expression for top room
       validExpressions.append(str(expressions[i][j+1]))
 
@@ -61,10 +60,8 @@ class WumpusAgent:
   def tellSensations(self, percept):
     posX, posY = self.world.getAgentPosition()
     for perception, perceptionValue in enumerate(percept):
-      prefix = '~'
-      if perceptionValue:
-        prefix = ''
-      self.wumpus_kb.tell(expr(prefix + str(sensations[posX][posY][perception])))
+      prefix = '' if perceptionValue else '~' 
+      self.wumpus_kb.tell(expr(prefix + str(self.sensations[posX][posY][perception])))
   
 
   def exploreWorld(self):
