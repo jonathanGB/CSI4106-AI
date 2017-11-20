@@ -49,8 +49,8 @@ class WumpusAgent:
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.GLITTER] | '<=>' | self.golds[i][j])
         # scream means no stench
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.sensations[i][j][Sensations.STENCH])
-    self.wumpus_kb.tell('~P00')
-    self.wumpus_kb.tell('~G00')
+    self.wumpus_kb.tell('~Pi00')
+    self.wumpus_kb.tell('~Go00')
 
   # utility method for generating a conjoined expression for valid adjacent rooms to a given room
   def getValidAdjacentRoomExpressions(self, i, j, expressions):
