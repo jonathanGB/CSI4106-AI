@@ -41,7 +41,7 @@ class WumpusWorld:
 
   def __init__(self, other=None):
     self._size = 4
-    self._rooms = deepcopy(other._rooms) if other else [[Room() for _ in range(self._size)] for _ in range(self._size)]
+    self._rooms = copy(other._rooms) if other else [[Room() for _ in range(self._size)] for _ in range(self._size)]
 
     self._wumpusPosition = other._wumpusPosition if other else None
     self._agentDead = other._agentDead if other else False

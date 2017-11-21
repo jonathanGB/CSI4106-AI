@@ -30,6 +30,8 @@ class WumpusAgent:
     self.wumpuss = [[] for _ in range(self.world.getSize())]
     self.golds = [[] for _ in range(self.world.getSize())]
     
+    self.symbols = []
+
     # initialize expressions for sensations, pits, wumpuss, and golds at every index
     for i in range(self.world.getSize()):
       for j in range(self.world.getSize()):
@@ -43,6 +45,12 @@ class WumpusAgent:
         self.pits[i].append(expr('Pi{}{}'.format(i,j)))
         self.wumpuss[i].append(expr('Wu{}{}'.format(i,j)))
         self.golds[i].append(expr('Go{}{}'.format(i,j)))
+        self.symbols.extend(self.sensations[i][j])
+      self.symbols.extend(self.pits[i])
+      self.symbols.extend(self.wumpuss[i])
+      self.symbols.extend(self.golds[i])
+    
+    
 
     # populate the database with wumpus world rules
     for i in range(self.world.getSize()):
@@ -55,8 +63,8 @@ class WumpusAgent:
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.GLITTER] | '<=>' | self.golds[i][j])
         # scream means no stench
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.sensations[i][j][Sensations.STENCH])
-    self.wumpus_kb.tell('~P00')
-    self.wumpus_kb.tell('~G00')
+    self.wumpus_kb.tell('~Pi00')
+    self.wumpus_kb.tell('~Gi00')
 
   # utility method for generating a conjoined expression for valid adjacent rooms to a given room
   def getValidAdjacentRoomExpressions(self, i, j, expressions):
@@ -110,14 +118,14 @@ class WumpusAgent:
         tempUnsafe = self.unsafeRooms.copy()
         for locationX, locationY in tempUnsafe:
           # if the location contains a pit, remove it from consideration
-          if self.wumpus_kb.ask_if_true(self.pits[locationX][locationY]):
+          if self.checkIfTrue(self.pits[locationX][locationY]):
             self.unsafeRooms.discard((locationX, locationY))
           
           # check if there is no longer any chance that the location has a pit
-          elif self.wumpus_kb.ask_if_true(~self.pits[locationX][locationY]):
+          elif self.checkIfTrue(~self.pits[locationX][locationY]):
             self.unsafeRooms.discard((locationX, locationY))
             # check if the room might have a wumpus
-            if self.wumpus_kb.ask_if_true(~self.wumpuss[locationX][locationY]):
+            if self.checkIfTrue(~self.wumpuss[locationX][locationY]):
               self.safeRooms.add((locationX, locationY))
             else:
               self.wumpusRooms.add((locationX, locationY))
@@ -125,13 +133,13 @@ class WumpusAgent:
         tempWumpus = self.wumpusRooms.copy()
         for locationX, locationY in tempWumpus:
           # if the location contains a pit, remove it from consideration
-          if self.wumpus_kb.ask_if_true(self.pits[locationX][locationY]):
+          if self.checkIfTrue(self.pits[locationX][locationY]):
             self.wumpusRooms.discard((locationX, locationY))
           
           # check for pit
-          elif self.wumpus_kb.ask_if_true(~self.pits[locationX][locationY]):
+          elif self.checkIfTrue(~self.pits[locationX][locationY]):
             # check if the room is now safe
-            if self.wumpus_kb.ask_if_true(~self.wumpuss[locationX][locationY]):
+            if self.checkIfTrue(~self.wumpuss[locationX][locationY]):
               self.safeRooms.add((locationX, locationY))
           else:
             # chance of pit so we move this room to the set of unsafe rooms
@@ -227,6 +235,13 @@ class WumpusAgent:
       print("Gold found! :)")
 
     print("Took {} moves ({}s)\nPayoff: {}".format(self.moves, delta, self.payoff))
+
+  # use dpll to check if an expression is true
+  def checkIfTrue(self, expression):
+    self.wumpus_kb.tell(~expression)
+    result = dpll(self.wumpus_kb.clauses, self.symbols, {})
+    self.wumpus_kb.retract(~expression)
+    return not result
 
   def astar_search(self, routeProblem):
     print('A* ------------------------------------')
