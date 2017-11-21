@@ -151,7 +151,10 @@ class WumpusAgent:
         # Last resort, we try to get to unvisited room that may contain a pit
         if len(self.safeRooms) > 0:
           print("Finding path to a safe room")
-          self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms)))
+          routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
+          self.plan = self.astar_search(routeProblem)
+          print(routeProblem.allowed)
+          print(str(self.plan))
         elif len(self.wumpusRooms) > 0:
           print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
@@ -165,13 +168,11 @@ class WumpusAgent:
           break
 
       else:
-        self.payoff += self.world.applyAction(self.plan.pop())
+        self.payoff += self.world.applyAction(self.plan.pop(0))
         self.moves += 1
     
       iteration += 1
       self.printWorld(iteration)
-      
-      print("Action applied.")
       self.printInfo()
       
 
