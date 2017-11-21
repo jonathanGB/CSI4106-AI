@@ -1,6 +1,7 @@
 from WumpusWorld import *
+
 class RouteProblem:
-  def __init__(self, state, goals, allowed, action=None, cost=0, previous=None):
+    def __init__(self, state, goals, allowed, action=None, cost=0, previous=None):
         self.state = state  # state represented by the node
         self.previous = previous  # previous node in the solution path
         self.goals = goals
@@ -51,8 +52,28 @@ class RouteProblem:
         return self.g
 
     def heuristic(self):
-        # TODO calculate heuristic
-        return -1
+        minEstimate = 100
+        agentX, agentY = self.state.getAgentPosition()
+        for goalX, goalY in self.goals:
+            xDelta = goalX - agentX # horizontal distance between agent and goal
+            yDelta = goalY - agentY # vertical distance between agent and goal
+            goalDirection = (self.getSign(xDelta),self.getSign(yDelta))
+            agentDirection = Directions.DIRECTION_VECTORS[self.state.direction]
+            rotationCount = 2
+            if goalDirection == agentDirection:
+                rotationCount = 0 # no rotations needed if agent is already facing the goal
+            elif reduce(lambda x1, x2, y1, y2: abs(x1-y1 * x2-y2) == 1,agentDirection, goalDirection):
+                # only 1 rotation is needed if the agent's direction is adjacent to the goal e.g. Right (1,0) and Up (0,1)
+                rotationCount = 1 
+            
+            goalEstimate = abs(xDelta) + abs(yDelta) + rotationCount
+            if goalEstimate < minEstimate:
+                minEstimate = goalEstimate
+
+        return minEstimate
+
+    def getSign(self, num):
+        return (num > 0) - (num < 0)
 
 
     ####################
@@ -61,7 +82,8 @@ class RouteProblem:
 
     def _createNodeIfAllowed(self, action):
         newState = WumpusWorld(self.state)
-        cost = newState.executeAction(action)
+        # payoffs except for gold are negative so we take the negation to get a positive cost
+        cost = -1 * newState.executeAction(action)
         if newState.getAgentPosition() in self.allowed
             return RouteProblem(newState, self.goals, self.allowed, action, self.g + cost, self)
         return None

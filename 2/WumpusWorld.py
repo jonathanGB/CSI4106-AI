@@ -8,6 +8,12 @@ class Directions:
   RIGHT = 1
   DOWN = 2
   LEFT = 3
+  DIRECTION_VECTORS = {
+    Directions.UP: (0,1),
+    Directions.LEFT: (-1,0),
+    Directions.DOWN: (0,-1),
+    Directions.RIGHT: (1,0)
+  }
 
 class Actions(Enum):
   MOVE_FORWARD = 0
@@ -36,14 +42,6 @@ class WumpusWorld:
   def __init__(self, other=None):
     self._size = 4
     self._rooms = deepcopy(other._rooms) if other else [[Room() for _ in range(self._size)] for _ in range(self._size)]
-    
-    # used for applying movement to the agent
-    self._moveVectors = {
-        Directions.UP: (0,1),
-        Directions.LEFT: (-1,0),
-        Directions.DOWN: (0,-1),
-        Directions.RIGHT: (0,0)
-      }
 
     self._wumpusPosition = other._wumpusPosition if other else None
     self._agentDead = other._agentDead if other else False
@@ -129,7 +127,7 @@ class WumpusWorld:
   # returns payoff of action
   def applyAction(self, action):
     if action == Actions.MOVE_FORWARD:
-      moveLocation = tuple(map(lambda x, y: x + y, self._moveVectors[self.direction], self._agentPosition))
+      moveLocation = tuple(map(lambda x, y: x + y, Directions.DIRECTION_VECTORS[self.direction], self._agentPosition))
       
       # if we move out of bounds in x or y
       if -1 in moveLocation or self._size in moveLocation:
@@ -175,7 +173,7 @@ class WumpusWorld:
       # get unit vector from agent to wumpus
       wumpusDirectionUnit = tuple(map(lambda x: x / wumpusDirectionNorm, (wumpusDirectionX, wumpusDirectionY)))
       # get unit vector of arrow direction
-      arrowDirectionUnit = self._moveVectors[self.direction]
+      arrowDirectionUnit = Directions.DIRECTION_VECTORS[self.direction]
 
       # check if both vectors are equal (arrow hits wumpus)
       if wumpusDirectionUnit == arrowDirectionUnit:

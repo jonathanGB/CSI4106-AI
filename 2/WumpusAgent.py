@@ -107,11 +107,34 @@ class WumpusAgent:
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
-        for location in self.unsafeRooms:
-          # TODO query kb and fringe
+        for locationX, locationY in self.unsafeRooms.copy():
+          # if the location contains a pit, remove it from consideration
+          if self.wumpus_kb.ask_if_true(self.pits[locationX][locationY]):
+            self.unsafeRooms.discard((locationX, locationY))
+          
+          # check if there is no longer any chance that the location has a pit
+          elif self.wumpus_kb.ask_if_true(~self.pits[locationX][locationY]):
+            self.unsafeRooms.discard((locationX, locationY))
+            # check if the room might have a wumpus
+            if self.wumpus_kb.ask_if_true(~self.wumpuss[locationX][locationY]):
+              self.safeRooms.add((locationX, locationY))
+            else:
+              self.wumpusRooms.add((locationX, locationY))
 
-        for location in self.wumpusRooms:
-          # TODO query kb and fringe
+        for locationX, locationY in self.wumpusRooms.copy():
+          # if the location contains a pit, remove it from consideration
+          if self.wumpus_kb.ask_if_true(self.pits[locationX][locationY]):
+            self.wumpusRooms.discard((locationX, locationY))
+          
+          # check for pit
+          elif self.wumpus_kb.ask_if_true(~self.pits[locationX][locationY]):
+            # check if the room is now safe
+            if self.wumpus_kb.ask_if_true(~self.wumpuss[locationX][locationY]):
+              self.safeRooms.add((locationX, locationY))
+          else:
+            # chance of pit so we move this room to the set of unsafe rooms
+            self.wumpusRooms.discard((locationX, locationY))
+            self.unsafeRooms.add((locationX, locationY))
 
         # Try to get to an unvisited safe room if possible
         # If not, we try to get to unvisited room that may contain a wumpus
@@ -120,10 +143,12 @@ class WumpusAgent:
           self.plan = self.astar_search(RouteProblem(self.world, self.safeRooms, self.visited.union(self.safeRooms)))
         elif len(self.wumpusRooms) > 0:
           self.plan = self.astar_search(RouteProblem(self.world, self.wumpusRooms, self.visited.union(self.wumpusRooms)))
+          # before moving into the tile that might have a wumpus, take a shot
+          self.plan.insert(len(self.plan) - 2, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
           self.plan = self.astar_search(RouteProblem(self.world, self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
-          # We are surrounded by walls and/or pits so we give up.
+          # We are surrounded by walls and/or pits. Puzzle is not solvable.
 
       else:
         self.payoff += self.world.applyAction(self.plan.pop())
@@ -202,7 +227,7 @@ class WumpusAgent:
 
   def astar_search(self, routeProblem):
     print('A* ------------------------------------')
-    open_nodes = PriorityQueue(max, priority_function)
+    open_nodes = PriorityQueue(min, priority_function)
     visited = set() # used to keep track of visited nodes
     open_nodes.enqueue(routeProblem)
 
