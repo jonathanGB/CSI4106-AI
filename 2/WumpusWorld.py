@@ -53,6 +53,9 @@ class WumpusWorld:
     if not other:
       self.createWumpusWorld()
 
+  def getRoom(self, i, j):
+    return self._rooms[i][j]
+
   def createWumpusWorld(self):
     # init
     freePositions = [ij for ij in range(1, 16)] # stores i x j of all free locations (0 is discarded from the start)

@@ -92,7 +92,7 @@ class WumpusAgent:
 
   def intelligentExploreWorld(self):
     start = timeit.default_timer()
-    
+    iteration = 0
 
     while not self.world.isAgentDead():
       if len(self.plan) == 0:
@@ -164,6 +164,9 @@ class WumpusAgent:
       else:
         self.payoff += self.world.applyAction(self.plan.pop())
         self.moves += 1
+    
+      iteration += 1
+      self.printWorld(iteration)
       
 
 
@@ -268,6 +271,24 @@ class WumpusAgent:
   
   def priority_function(self, routeProblem):
     return routeProblem.f
+
+  def printWorld(self, iteration):
+    print("Iteration {}:".format(iteration))
+
+    for i in range(self.world.getSize()):
+      for j in range(self.world.getSize()):
+        if j == 0:
+          print("\n --------------- \n|", end='')
+          
+        currentRoom = self.world.getRoom(i, j)
+        val = 'G ' if currentRoom.hasGold else 'P ' if currentRoom.hasPit else 'W ' if currentRoom.hasWumpus else '  '
+        val += 'A' if self.world.getAgentPosition() == (i,j) else ' '
+        print(val + "|", end='')
+
+    print("\n --------------- \n", end='')
+    
+    sensations = self.world.getAgentSensations()
+    print("Breeze: {}, Stench: {}, Glitter: {}, Bump: {}, Scream: {}\n\n".format(sensations[0], sensations[1], sensations[2], sensations[3], sensations[4]))
 
 # start script here
 agent = WumpusAgent()
