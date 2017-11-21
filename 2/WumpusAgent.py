@@ -150,13 +150,13 @@ class WumpusAgent:
         # If not, we try to get to unvisited room that may contain a wumpus
         # Last resort, we try to get to unvisited room that may contain a pit
         if len(self.safeRooms) > 0:
-          self.plan = self.astar_search(RouteProblem(self.world, self.safeRooms, self.visited.union(self.safeRooms)))
+          self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms)))
         elif len(self.wumpusRooms) > 0:
-          self.plan = self.astar_search(RouteProblem(self.world, self.wumpusRooms, self.visited.union(self.wumpusRooms)))
+          self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
           self.plan.insert(len(self.plan) - 2, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
-          self.plan = self.astar_search(RouteProblem(self.world, self.unsafeRooms, self.visited.union(self.unsafeRooms)))
+          self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
           break

@@ -24,7 +24,7 @@ class RouteProblem:
 
     # Returns a list of all new nodes that represents next possible states in the exploration
     def expand(self):
-        return map(lambda s: self._createNodeIfAllowed(s), self.state.getPossibleActions())
+        return filter(lambda s: s is not None, map(lambda s: self._createNodeIfAllowed(s), self.state.getPossibleActions()))
 
     # Extracts the sequence of states and actions that lead to current node
     def extractSolution(self):
@@ -64,7 +64,7 @@ class RouteProblem:
             goalDirection = (self.getSign(xDelta),self.getSign(yDelta))
             agentDirection = Directions.DIRECTION_VECTORS[self.state.direction]
             rotationCount = 2
-            if goalDirection == agentDirection:
+            if goalDirection == agentDirection or goalDirection == (0,0):
                 rotationCount = 0 # no rotations needed if agent is already facing the goal
             elif abs(agentDirection[0]-goalDirection[0]) * abs(agentDirection[1]-goalDirection[1]) == 1:
                 # only 1 rotation is needed if the agent's direction is adjacent to the goal e.g. Right (1,0) and Up (0,1)
