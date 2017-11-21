@@ -188,3 +188,8 @@ class WumpusWorld:
             self._rooms[i][j].sensations[Sensations.SCREAM] = True
 
       return -10
+
+  # returns a unique string based on current state of the world
+  def toString(self):
+    # for pathfinding, we only need to know the agent's position and direction
+    return str(self._agentPosition) + str(self.direction)

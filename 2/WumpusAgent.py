@@ -1,6 +1,7 @@
 from utils import *
 from logic import *
 from WumpusWorld import *
+from RouteProblem import *
 import timeit
 import random
 
@@ -16,7 +17,12 @@ class WumpusAgent:
     self.wumpus_kb = PropKB()
     self.payoff = 0
     self.moves = 0
-    self.plan = PriorityQueue(min, lambda x: x.priority)
+    self.plan = []
+
+    self.safeRooms = set() # set of tuples to store safe rooms we are able to reach
+    self.wumpusRooms = set() # set of tuples to store rooms that may contain a wumpus
+    self.unsafeRooms = set() # set of tuples to store rooms that may contain a pit
+    self.visited = set() # set of rooms we have already visited (guaranteed to be safe)
 
     # expressions for the knowledge base
     self.sensations = [[] for _ in range(self.world.getSize())]
@@ -76,6 +82,82 @@ class WumpusAgent:
       prefix = '' if perceptionValue else '~' 
       self.wumpus_kb.tell(expr(prefix + str(self.sensations[posX][posY][perception])))  
 
+  def intelligentExploreWorld(self):
+    start = timeit.default_timer()
+    
+
+    while not self.world.isAgentDead():
+      if len(self.plan) == 0:
+        posX, posY = self.world.getAgentPosition()
+        percept = self.world.getAgentSensations()
+        self.tellSensations(percept)
+        
+        # check if we are on gold
+        if percept[Sensations.GLITTER]:
+          self.payoff += self.world.applyAction(Actions.GRAB_OBJECT)
+          self.moves += 1
+          break
+
+        self.visited.add((posX, posY))
+        self.removeLocationFromFringe((posX, posY))
+
+        # add new reachable locations to the fringe
+        for location in self.getValidAdjacentLocations(posX, posY):
+          if location not in visited:
+            self.unsafeRooms.add(location)
+
+        # recheck safety of fringe locations we were not sure about
+        for location in self.unsafeRooms:
+          # TODO query kb and fringe
+
+        for location in self.wumpusRooms:
+          # TODO query kb and fringe
+
+        # Try to get to an unvisited safe room if possible
+        # If not, we try to get to unvisited room that may contain a wumpus
+        # Last resort, we try to get to unvisited room that may contain a pit
+        if len(self.safeRooms) > 0:
+          self.plan = self.astar_search(RouteProblem(self.world, self.safeRooms, self.visited.union(self.safeRooms)))
+        elif len(self.wumpusRooms) > 0:
+          self.plan = self.astar_search(RouteProblem(self.world, self.wumpusRooms, self.visited.union(self.wumpusRooms)))
+        elif len(self.unsafeRooms) > 0:
+          self.plan = self.astar_search(RouteProblem(self.world, self.unsafeRooms, self.visited.union(self.unsafeRooms)))
+        else:
+          # We are surrounded by walls and/or pits so we give up.
+
+      else:
+        self.payoff += self.world.applyAction(self.plan.pop())
+        self.moves += 1
+      
+
+
+    self.printResults(timeit.default_timer() - start)
+
+  def removeLocationFromFringe(self, location):
+    if location in self.safeRooms:
+      self.safeRooms.remove(location)
+    elif location in self.wumpusRooms:
+      self.wumpusRooms.remove(location)
+    elif location in self.unsafeRooms:
+      self.unsafeRooms.remove(location)
+
+  def getValidAdjacentLocations(self, i, j):
+    validLocations = []
+    if i - 1 >= 0:
+      # add left location
+      validLocations.append((i-1,j))
+    if i + 1 < self.world.getSize():
+      # add right location
+      validLocations.append((i+1,j))
+    if j - 1 >= 0:
+      # add bottom location
+      validLocations.append((i,j-1))
+    if j + 1 < self.world.getSize():
+      # add top location
+      validLocations.append((i,j+1))
+
+    return validLocations
+
   def dumbExploreWorld(self):
     start = timeit.default_timer()
     lastAction = None
@@ -117,6 +199,32 @@ class WumpusAgent:
       print("Gold found! :)")
 
     print("Took {} moves ({}s)\nPayoff: {}".format(self.moves, delta, self.payoff))
+
+  def astar_search(self, routeProblem):
+    print('A* ------------------------------------')
+    open_nodes = PriorityQueue(max, priority_function)
+    visited = set() # used to keep track of visited nodes
+    open_nodes.enqueue(routeProblem)
+
+    while not open_nodes.isEmpty():
+        current = open_nodes.dequeue()
+        currentHash = current.state.toString() # to be stored in the set of visted nodes
+
+        if current.isGoal():
+            return current.extractSolution()
+
+        if currentHash in visited:
+            continue
+
+        visited.add(currentHash)
+
+        for neighbor in current.expand():
+            open_nodes.enqueue(neighbor)
+
+    return []
+  
+  def priority_function(routeProblem):
+    return routeProblem.f
 
 # start script here
 agent = WumpusAgent()
