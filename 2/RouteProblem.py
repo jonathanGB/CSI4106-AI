@@ -84,6 +84,6 @@ class RouteProblem:
         newState = WumpusWorld(self.state)
         # payoffs except for gold are negative so we take the negation to get a positive cost
         cost = -1 * newState.executeAction(action)
-        if newState.getAgentPosition() in self.allowed
+        if newState.getAgentPosition() in self.allowed:
             return RouteProblem(newState, self.goals, self.allowed, action, self.g + cost, self)
         return None

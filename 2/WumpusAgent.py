@@ -103,7 +103,7 @@ class WumpusAgent:
 
         # add new reachable locations to the fringe
         for location in self.getValidAdjacentLocations(posX, posY):
-          if location not in visited:
+          if location not in self.visited:
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
@@ -149,6 +149,7 @@ class WumpusAgent:
           self.plan = self.astar_search(RouteProblem(self.world, self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
+          break
 
       else:
         self.payoff += self.world.applyAction(self.plan.pop())
@@ -253,4 +254,4 @@ class WumpusAgent:
 
 # start script here
 agent = WumpusAgent()
-agent.dumbExploreWorld()
+agent.intelligentExploreWorld()
