@@ -150,12 +150,15 @@ class WumpusAgent:
         # If not, we try to get to unvisited room that may contain a wumpus
         # Last resort, we try to get to unvisited room that may contain a pit
         if len(self.safeRooms) > 0:
+          print("Finding path to a safe room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms)))
         elif len(self.wumpusRooms) > 0:
+          print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
           self.plan.insert(len(self.plan) - 2, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
+          print("Finding path to an unsafe room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
@@ -164,10 +167,19 @@ class WumpusAgent:
       else:
         self.payoff += self.world.applyAction(self.plan.pop())
         self.moves += 1
+        print("Action applied.")
+        self.printInfo()
       
 
 
     self.printResults(timeit.default_timer() - start)
+
+  def printInfo(self):
+    print("Current location: " + str(self.world.getAgentPosition()))
+    print("Safe rooms: " + str(self.safeRooms))
+    print("Wumpus rooms: " + str(self.wumpusRooms))
+    print("Unsafe rooms: " + str(self.unsafeRooms))
+    print("Visited rooms: " + str(self.visited))
 
   def removeLocationFromFringe(self, location):
     if location in self.safeRooms:
