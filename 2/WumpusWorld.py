@@ -117,9 +117,9 @@ class WumpusWorld:
     agentX, agentY = self._agentPosition
     self._agentSensations = self._rooms[agentX][agentY].sensations
 
-  def getPossibleActions(self, position):
+  def getPossibleActions(self):
     # assuming no actions possible if the agent is in the same room as a pit or a wumpus
-    positionX, positionY = position
+    positionX, positionY = self._agentPosition
     if self._rooms[positionX][positionY].hasPit or self._rooms[positionX][positionY].hasWumpus:
       return []
     return [Actions.MOVE_FORWARD, Actions.TURN_LEFT, Actions.TURN_RIGHT, Actions.GRAB_OBJECT, Actions.FIRE_ARROW]

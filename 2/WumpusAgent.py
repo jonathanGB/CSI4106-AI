@@ -64,7 +64,7 @@ class WumpusAgent:
         # scream means no stench
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.sensations[i][j][Sensations.STENCH])
     self.wumpus_kb.tell('~Pi00')
-    self.wumpus_kb.tell('~Gi00')
+    self.wumpus_kb.tell('~Go00')
 
   # utility method for generating a conjoined expression for valid adjacent rooms to a given room
   def getValidAdjacentRoomExpressions(self, i, j, expressions):
@@ -245,12 +245,12 @@ class WumpusAgent:
 
   def astar_search(self, routeProblem):
     print('A* ------------------------------------')
-    open_nodes = PriorityQueue(min, priority_function)
+    open_nodes = PriorityQueue(min, self.priority_function)
     visited = set() # used to keep track of visited nodes
-    open_nodes.enqueue(routeProblem)
+    open_nodes.append(routeProblem)
 
-    while not open_nodes.isEmpty():
-        current = open_nodes.dequeue()
+    while not len(open_nodes) == 0:
+        current = open_nodes.pop()
         currentHash = current.state.toString() # to be stored in the set of visted nodes
 
         if current.isGoal():
@@ -262,11 +262,11 @@ class WumpusAgent:
         visited.add(currentHash)
 
         for neighbor in current.expand():
-            open_nodes.enqueue(neighbor)
+            open_nodes.append(neighbor)
 
     return []
   
-  def priority_function(routeProblem):
+  def priority_function(self, routeProblem):
     return routeProblem.f
 
 # start script here

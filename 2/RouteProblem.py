@@ -11,16 +11,20 @@ class RouteProblem:
         self.f = self.g + self.h  # total estimated cost
         self.action = action  # action that resulted in the state represented by the node
 
+    #required for priority queue
+    def __lt__(self, other):
+        return False
+
     ####################
     # Public methods
     ####################
 
     def isGoal(self):
-        return self.state.getAgentPosition() in goals
+        return self.state.getAgentPosition() in self.goals
 
     # Returns a list of all new nodes that represents next possible states in the exploration
     def expand(self):
-        return map(lambda s: self._createNodeIfAllowed(s), self.state.possibleActions())
+        return map(lambda s: self._createNodeIfAllowed(s), self.state.getPossibleActions())
 
     # Extracts the sequence of states and actions that lead to current node
     def extractSolution(self):
@@ -62,7 +66,7 @@ class RouteProblem:
             rotationCount = 2
             if goalDirection == agentDirection:
                 rotationCount = 0 # no rotations needed if agent is already facing the goal
-            elif reduce(lambda x1, x2, y1, y2: abs(x1-y1 * x2-y2) == 1,agentDirection, goalDirection):
+            elif abs(agentDirection[0]-goalDirection[0]) * abs(agentDirection[1]-goalDirection[1]) == 1:
                 # only 1 rotation is needed if the agent's direction is adjacent to the goal e.g. Right (1,0) and Up (0,1)
                 rotationCount = 1 
             
@@ -83,7 +87,7 @@ class RouteProblem:
     def _createNodeIfAllowed(self, action):
         newState = WumpusWorld(self.state)
         # payoffs except for gold are negative so we take the negation to get a positive cost
-        cost = -1 * newState.executeAction(action)
+        cost = -1 * newState.applyAction(action)
         if newState.getAgentPosition() in self.allowed:
             return RouteProblem(newState, self.goals, self.allowed, action, self.g + cost, self)
         return None
