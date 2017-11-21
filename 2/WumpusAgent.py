@@ -107,7 +107,8 @@ class WumpusAgent:
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
-        for locationX, locationY in self.unsafeRooms.copy():
+        tempUnsafe = self.unsafeRooms.copy()
+        for locationX, locationY in tempUnsafe:
           # if the location contains a pit, remove it from consideration
           if self.wumpus_kb.ask_if_true(self.pits[locationX][locationY]):
             self.unsafeRooms.discard((locationX, locationY))
@@ -121,7 +122,8 @@ class WumpusAgent:
             else:
               self.wumpusRooms.add((locationX, locationY))
 
-        for locationX, locationY in self.wumpusRooms.copy():
+        tempWumpus = self.wumpusRooms.copy()
+        for locationX, locationY in tempWumpus:
           # if the location contains a pit, remove it from consideration
           if self.wumpus_kb.ask_if_true(self.pits[locationX][locationY]):
             self.wumpusRooms.discard((locationX, locationY))
