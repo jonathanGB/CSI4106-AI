@@ -288,15 +288,16 @@ class WumpusAgent:
 
   def printWorld(self, iteration):
     print("Iteration {}:".format(iteration))
-
-    for i in range(self.world.getSize()):
+    dir = self.world.direction
+    dirStr = '←' if dir == Directions.LEFT else '↑' if dir == Directions.UP else '→' if dir == Directions.RIGHT else '↓'
+    for i in reversed(range(self.world.getSize())):
       for j in range(self.world.getSize()):
         if j == 0:
           print("\n --------------- \n|", end='')
           
         currentRoom = self.world.getRoom(i, j)
         val = 'G ' if currentRoom.hasGold else 'P ' if currentRoom.hasPit else 'W ' if currentRoom.hasWumpus else '  '
-        val += 'A' if self.world.getAgentPosition() == (i,j) else ' '
+        val += dirStr if self.world.getAgentPosition() == (i,j) else ' '
         print(val + "|", end='')
 
     print("\n --------------- \n", end='')
