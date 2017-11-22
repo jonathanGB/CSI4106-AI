@@ -12,8 +12,8 @@ class ActionPriority:
   NOT_SAFE = 3
 
 class WumpusAgent:
-  def __init__(self):
-    self.world = WumpusWorld()
+  def __init__(self, world=None):
+    self.world = WumpusWorld(world)
     self.wumpus_kb = PropKB()
     self.payoff = 0
     self.moves = 0
@@ -155,7 +155,7 @@ class WumpusAgent:
           self.plan = self.astar_search(routeProblem)
           print(routeProblem.allowed)
           print(str(self.plan))
-        elif len(self.wumpusRooms) > 0:
+        elif not self.world.isWumpusDead and len(self.wumpusRooms) > 0:
           print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
@@ -307,5 +307,9 @@ class WumpusAgent:
     print("Breeze: {}, Stench: {}, Glitter: {}, Bump: {}, Scream: {}\n\n".format(sensations[0], sensations[1], sensations[2], sensations[3], sensations[4]))
 
 # start script here
-agent = WumpusAgent()
+agent = WumpusAgent({
+  "wumpusPosition": (1, 0),
+  "goldPosition": (0, 3),
+  "pitPositions": []
+})
 agent.intelligentExploreWorld()

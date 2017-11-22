@@ -63,7 +63,8 @@ class WumpusWorld:
     self._agentPosition = other._agentPosition if isinstance(other, WumpusWorld) else (0,0) # position of the agent
     self.direction = other.direction if isinstance(other, WumpusWorld) else Directions.RIGHT # defaults directions is right
     self._agentSensations = copy(other._agentSensations) if isinstance(other, WumpusWorld) else [False, False, False, False, False] # sensations available to
-    
+    self.isWumpusDead = other.isWumpusDead if isinstance(other, WumpusWorld) else False
+
     ''' in case other is a map to create a specific world
         other = {
           "wumpusPosition": (x,y),
@@ -206,6 +207,10 @@ class WumpusWorld:
       return 1000
 
     if action == Actions.FIRE_ARROW:
+      print("KKKKKKKKKK" + str(self.isWumpusDead))
+      if self.isWumpusDead:
+        return -10
+
       # get vector from agent to wumpus
       wumpusDirectionX, wumpusDirectionY = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
       # vector norm (length)
@@ -218,6 +223,8 @@ class WumpusWorld:
       # check if both vectors are equal (arrow hits wumpus)
       if wumpusDirectionUnit == arrowDirectionUnit:
         wumpusX, wumpusY = self._wumpusPosition
+        self._rooms[wumpusX][wumpusY].hasWumpus = False
+        self.isWumpusDead = True
         self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
 
         # scream in all rooms
