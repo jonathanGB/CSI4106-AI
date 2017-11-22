@@ -21,6 +21,7 @@ class WumpusAgent:
     self.moves = 0
     self.plan = []
     self.verbose = verbose
+    self.killedWumpus = False
 
     self.safeRooms = set() # set of tuples to store safe rooms we are able to reach
     self.wumpusRooms = set() # set of tuples to store rooms that may contain a wumpus
@@ -64,6 +65,9 @@ class WumpusAgent:
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.STENCH] | '<=>' | self.getValidAdjacentRoomExpressions(i,j,self.wumpuss))
         # glitter
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.GLITTER] | '<=>' | self.golds[i][j])
+        for k in range(self.world.getSize()):
+          for l in range(self.world.getSize()):
+            self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.wumpuss[k][l])
     self.wumpus_kb.tell('~Pi00')
     self.wumpus_kb.tell('~Go00')
 
@@ -136,10 +140,11 @@ class WumpusAgent:
           elif self.checkIfTrue(~self.pits[locationX][locationY]):
             self.unsafeRooms.discard((locationX, locationY))
             # check if the room might have a wumpus
-            if self.checkIfTrue(~self.wumpuss[locationX][locationY]):
-              self.safeRooms.add((locationX, locationY))
-            else:
-              self.wumpusRooms.add((locationX, locationY))
+            if not self.killedWumpus:
+              if self.checkIfTrue(~self.wumpuss[locationX][locationY]):
+                self.safeRooms.add((locationX, locationY))
+              else:
+                self.wumpusRooms.add((locationX, locationY))
 
         tempWumpus = self.wumpusRooms.copy()
         for locationX, locationY in tempWumpus:
@@ -175,8 +180,6 @@ class WumpusAgent:
             print("Finding path to a wumpus room")
 
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
-          # before moving into the tile that might have a wumpus, take a shot
-          self.plan.insert(len(self.plan) - 1, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
           if self.verbose:
             print("Finding path to an unsafe room")
@@ -188,6 +191,17 @@ class WumpusAgent:
           print(str(self.plan))
 
       else:
+        if not self.killedWumpus and len(self.plan) == 1:
+          # The last action is always the movement forward into a goal tile
+          # Before doing so, we should check if the tile might contain a wumpus and fire an arrow if there is a chance
+          currentX, currentY = self.world.getAgentPosition()
+          moveX, moveY = Directions.DIRECTION_VECTORS[self.world.direction]
+          if not self.checkIfTrue(~self.wumpuss[currentX + moveX][currentY + moveY]):
+            self.payoff += self.world.applyAction(Actions.FIRE_ARROW)
+            self.moves += 1
+            if self.world.getAgentSensations()[Sensations.SCREAM]:
+              self.killedWumpus = True
+
         action = self.plan.pop(0)
         if self.verbose:
           print(str(action))
@@ -369,10 +383,6 @@ def simulation2500(id, verbose):
   # averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
   # print("Average payoff is {}".format(averagePayoff))
 
-agent = WumpusAgent({
-    "wumpusPosition": (0,2),
-    "goldPosition": (1, 2),
-    "pitPositions": [(2,0), (2,2), (3,3)]
-  }, True)
+agent = WumpusAgent(None, True)
 agent.intelligentExploreWorld()
 
