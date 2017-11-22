@@ -65,9 +65,7 @@ class WumpusAgent:
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.STENCH] | '<=>' | self.getValidAdjacentRoomExpressions(i,j,self.wumpuss))
         # glitter
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.GLITTER] | '<=>' | self.golds[i][j])
-        for k in range(self.world.getSize()):
-          for l in range(self.world.getSize()):
-            self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.wumpuss[k][l])
+
     self.wumpus_kb.tell('~Pi00')
     self.wumpus_kb.tell('~Go00')
 
@@ -135,6 +133,7 @@ class WumpusAgent:
           # if the location contains a pit, remove it from consideration
           if self.checkIfTrue(self.pits[locationX][locationY]):
             self.unsafeRooms.discard((locationX, locationY))
+            print(str(locationX) + "," + str(locationY) + " contains a pit. Eliminated location from consideration.")
           
           # check if there is no longer any chance that the location has a pit
           elif self.checkIfTrue(~self.pits[locationX][locationY]):
@@ -145,6 +144,8 @@ class WumpusAgent:
                 self.safeRooms.add((locationX, locationY))
               else:
                 self.wumpusRooms.add((locationX, locationY))
+            else:
+              self.safeRooms.add((locationX, locationY))
 
         tempWumpus = self.wumpusRooms.copy()
         for locationX, locationY in tempWumpus:
@@ -155,7 +156,7 @@ class WumpusAgent:
           # check for pit
           elif self.checkIfTrue(~self.pits[locationX][locationY]):
             # check if the room is now safe
-            if self.checkIfTrue(~self.wumpuss[locationX][locationY]):
+            if self.killedWumpus or self.checkIfTrue(~self.wumpuss[locationX][locationY]):
               self.wumpusRooms.discard((locationX, locationY))
               self.safeRooms.add((locationX, locationY))
           else:
@@ -200,6 +201,10 @@ class WumpusAgent:
             self.payoff += self.world.applyAction(Actions.FIRE_ARROW)
             self.moves += 1
             if self.world.getAgentSensations()[Sensations.SCREAM]:
+              # remove old stench from the knowledge base so as not to cause contradictions
+              for i in range(self.world.getSize()):
+                for j in range(self.world.getSize()):
+                  self.wumpus_kb.retract(self.sensations[i][j][Sensations.STENCH])
               self.killedWumpus = True
 
         action = self.plan.pop(0)
