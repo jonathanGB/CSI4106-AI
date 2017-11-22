@@ -147,7 +147,7 @@ class WumpusWorld:
       if currentRoom.hasPit or currentRoom.hasWumpus:
         self._agentDead = True
 
-      return -1000 if self._agentDead else -1
+      return -1
 
     if action == Actions.TURN_LEFT:
       self.direction = (self.direction - 1) % 4
