@@ -110,8 +110,10 @@ class WumpusAgent:
         self.removeLocationFromFringe((posX, posY))
 
         # add new reachable locations to the fringe
+        print("Adding new reachable locations...")
         for location in self.getValidAdjacentLocations(posX, posY):
           if location not in self.visited:
+            print(str(location))
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
@@ -153,7 +155,6 @@ class WumpusAgent:
           print("Finding path to a safe room")
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
-          print(routeProblem.allowed)
         elif len(self.wumpusRooms) > 0:
           print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))

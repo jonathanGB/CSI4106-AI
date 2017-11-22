@@ -218,12 +218,16 @@ class WumpusWorld:
       # check if both vectors are equal (arrow hits wumpus)
       if wumpusDirectionUnit == arrowDirectionUnit:
         wumpusX, wumpusY = self._wumpusPosition
+        self._rooms[wumpusX][wumpusY].hasWumpus = False
         self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
 
         # scream in all rooms
         for i in range(self._size):
           for j in range(self._size):
             self._rooms[i][j].sensations[Sensations.SCREAM] = True
+
+        # remove the wumpus
+        self._wumpusPosition = (-1,-1)
 
       return -10
 
