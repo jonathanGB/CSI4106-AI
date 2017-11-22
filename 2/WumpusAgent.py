@@ -145,12 +145,15 @@ class WumpusAgent:
           elif self.checkIfTrue(~self.pits[locationX][locationY]):
             # check if the room is now safe
             if self.checkIfTrue(~self.wumpuss[locationX][locationY]):
+              self.wumpusRooms.discard((locationX, locationY))
               self.safeRooms.add((locationX, locationY))
           else:
             # chance of pit so we move this room to the set of unsafe rooms
             self.wumpusRooms.discard((locationX, locationY))
             self.unsafeRooms.add((locationX, locationY))
 
+        if self.verbose:
+          self.printInfo()
         # Try to get to an unvisited safe room if possible
         # If not, we try to get to unvisited room that may contain a wumpus
         # Last resort, we try to get to unvisited room that may contain a pit
