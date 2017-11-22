@@ -247,6 +247,7 @@ class WumpusAgent:
 
   def printResults(self, delta):
     if self.world.isAgentDead():
+      self.payoff -= 1000
       print("Agent died! :(")
     if self.world.isGoldPickedUp():
       print("Gold found! :)")
