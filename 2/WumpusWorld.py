@@ -8,6 +8,12 @@ class Directions:
   RIGHT = 1
   DOWN = 2
   LEFT = 3
+  DIRECTION_VECTORS = {
+    0: (1,0), #Up
+    1: (0,1), #Right
+    2: (-1,0),#Down
+    3: (0,-1) #Left
+  }
 
 class Actions(Enum):
   MOVE_FORWARD = 0
@@ -31,29 +37,59 @@ class Room:
     self.hasWumpus = False
     self.sensations = [False, False, False, False, False]
 
+  def __str__(self):
+    return '''
+             hasPit:    {}
+             hasGold:   {}
+             hasWumpus: {}
+             sensations: {{
+               BREEZE:  {}
+               STENCH:  {}
+               GLITTER: {}
+               BUMP:    {}
+               SCREAM:  {}
+             }}
+           '''.format(self.hasPit, self.hasGold, self.hasWumpus, self.sensations[0], self.sensations[1], self.sensations[2], self.sensations[3], self.sensations[4])
+
 class WumpusWorld:
 
   def __init__(self, other=None):
     self._size = 4
-    self._rooms = deepcopy(other._rooms) if other else [[Room() for _ in range(self._size)] for _ in range(self._size)]
+    self._rooms = copy(other._rooms) if isinstance(other, WumpusWorld) else [[Room() for _ in range(self._size)] for _ in range(self._size)]
+
+    self._wumpusPosition = other._wumpusPosition if isinstance(other, WumpusWorld) else None
+    self._agentDead = other._agentDead if isinstance(other, WumpusWorld) else False
+    self._goldPickedUp = other._goldPickedUp if isinstance(other, WumpusWorld) else False
+    self._agentPosition = other._agentPosition if isinstance(other, WumpusWorld) else (0,0) # position of the agent
+    self.direction = other.direction if isinstance(other, WumpusWorld) else Directions.RIGHT # defaults directions is right
+    self._agentSensations = copy(other._agentSensations) if isinstance(other, WumpusWorld) else [False, False, False, False, False] # sensations available to
     
-    # used for applying movement to the agent
-    self._moveVectors = {
-        Directions.UP: (0,1),
-        Directions.LEFT: (-1,0),
-        Directions.DOWN: (0,-1),
-        Directions.RIGHT: (0,0)
-      }
+    ''' in case other is a map to create a specific world
+        other = {
+          "wumpusPosition": (x,y),
+          "goldPosition": (x,y),
+          "pitPositions": [(x1,y1),(x2,y2),...]
+        }
+    '''
+    if other and not isinstance(other, WumpusWorld):
+      wumpusX, wumpusY = other['wumpusPosition']
+      self._wumpusPosition = (wumpusX, wumpusY)
+      self._rooms[wumpusX][wumpusY].hasWumpus = True
+      self.updateSensation(Sensations.STENCH, True, wumpusX, wumpusY)
 
-    self._wumpusPosition = other._wumpusPosition if other else None
-    self._agentDead = other._agentDead if other else False
-    self._goldPickedUp = other._goldPickedUp if other else False
-    self._agentPosition = other._agentPosition if other else (0,0) # position of the agent
-    self.direction = other.direction if other else Directions.RIGHT # defaults directions is right
-    self._agentSensations = copy(other._agentSensations) if other else [False, False, False, False, False] # sensations available to
+      goldX, goldY = other['goldPosition']
+      self._rooms[goldX][goldY].hasGold = True
+      self._rooms[goldX][goldY].sensations[Sensations.GLITTER] = True
 
-    if not other:
+      for pit in other['pitPositions']:
+        pitX, pitY = pit
+        self._rooms[pitX][pitY].hasPit = True
+        self.updateSensation(Sensations.BREEZE, True, pitX, pitY)
+    elif not other:
       self.createWumpusWorld()
+
+  def getRoom(self, i, j):
+    return self._rooms[i][j]
 
   def createWumpusWorld(self):
     # init
@@ -84,6 +120,8 @@ class WumpusWorld:
       self._rooms[pitI][pitJ].hasPit = True
       self.updateSensation(Sensations.BREEZE, True, pitI, pitJ)
 
+    self._updateAgentSensations()
+
   def getAgentPosition(self):
     return self._agentPosition
 
@@ -99,6 +137,9 @@ class WumpusWorld:
 
   def getAgentSensations(self):
     return self._agentSensations
+
+  def getSize(self):
+    return self._size
 
   # updates sensations surrounding tile (i,j)
   def updateSensation(self, sensation, isSensed, i, j):
@@ -116,9 +157,9 @@ class WumpusWorld:
     agentX, agentY = self._agentPosition
     self._agentSensations = self._rooms[agentX][agentY].sensations
 
-  def getPossibleActions(self, position):
+  def getPossibleActions(self):
     # assuming no actions possible if the agent is in the same room as a pit or a wumpus
-    positionX, positionY = position
+    positionX, positionY = self._agentPosition
     if self._rooms[positionX][positionY].hasPit or self._rooms[positionX][positionY].hasWumpus:
       return []
     return [Actions.MOVE_FORWARD, Actions.TURN_LEFT, Actions.TURN_RIGHT, Actions.GRAB_OBJECT, Actions.FIRE_ARROW]
@@ -126,7 +167,7 @@ class WumpusWorld:
   # returns payoff of action
   def applyAction(self, action):
     if action == Actions.MOVE_FORWARD:
-      moveLocation = tuple(map(lambda x, y: x + y, self._moveVectors[self.direction], self._agentPosition))
+      moveLocation = tuple(map(lambda x, y: x + y, Directions.DIRECTION_VECTORS[self.direction], self._agentPosition))
       
       # if we move out of bounds in x or y
       if -1 in moveLocation or self._size in moveLocation:
@@ -141,7 +182,7 @@ class WumpusWorld:
       if currentRoom.hasPit or currentRoom.hasWumpus:
         self._agentDead = True
 
-      return -1000 if self._agentDead else -1
+      return -1
 
     if action == Actions.TURN_LEFT:
       self.direction = (self.direction - 1) % 4
@@ -172,7 +213,7 @@ class WumpusWorld:
       # get unit vector from agent to wumpus
       wumpusDirectionUnit = tuple(map(lambda x: x / wumpusDirectionNorm, (wumpusDirectionX, wumpusDirectionY)))
       # get unit vector of arrow direction
-      arrowDirectionUnit = self._moveVectors[self.direction]
+      arrowDirectionUnit = Directions.DIRECTION_VECTORS[self.direction]
 
       # check if both vectors are equal (arrow hits wumpus)
       if wumpusDirectionUnit == arrowDirectionUnit:
@@ -180,8 +221,13 @@ class WumpusWorld:
         self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
 
         # scream in all rooms
-        for i in range(self.size):
-          for j in range(self.size):
+        for i in range(self._size):
+          for j in range(self._size):
             self._rooms[i][j].sensations[Sensations.SCREAM] = True
 
       return -10
+
+  # returns a unique string based on current state of the world
+  def toString(self):
+    # for pathfinding, we only need to know the agent's position and direction
+    return str(self._agentPosition) + str(self.direction)
