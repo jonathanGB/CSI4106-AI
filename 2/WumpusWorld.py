@@ -37,20 +37,55 @@ class Room:
     self.hasWumpus = False
     self.sensations = [False, False, False, False, False]
 
+  def __str__(self):
+    return '''
+             hasPit:    {}
+             hasGold:   {}
+             hasWumpus: {}
+             sensations: {{
+               BREEZE:  {}
+               STENCH:  {}
+               GLITTER: {}
+               BUMP:    {}
+               SCREAM:  {}
+             }}
+           '''.format(self.hasPit, self.hasGold, self.hasWumpus, self.sensations[0], self.sensations[1], self.sensations[2], self.sensations[3], self.sensations[4])
+
 class WumpusWorld:
 
   def __init__(self, other=None):
     self._size = 4
-    self._rooms = copy(other._rooms) if other else [[Room() for _ in range(self._size)] for _ in range(self._size)]
+    self._rooms = copy(other._rooms) if isinstance(other, WumpusWorld) else [[Room() for _ in range(self._size)] for _ in range(self._size)]
 
-    self._wumpusPosition = other._wumpusPosition if other else None
-    self._agentDead = other._agentDead if other else False
-    self._goldPickedUp = other._goldPickedUp if other else False
-    self._agentPosition = other._agentPosition if other else (0,0) # position of the agent
-    self.direction = other.direction if other else Directions.RIGHT # defaults directions is right
-    self._agentSensations = copy(other._agentSensations) if other else [False, False, False, False, False] # sensations available to
+    self._wumpusPosition = other._wumpusPosition if isinstance(other, WumpusWorld) else None
+    self._agentDead = other._agentDead if isinstance(other, WumpusWorld) else False
+    self._goldPickedUp = other._goldPickedUp if isinstance(other, WumpusWorld) else False
+    self._agentPosition = other._agentPosition if isinstance(other, WumpusWorld) else (0,0) # position of the agent
+    self.direction = other.direction if isinstance(other, WumpusWorld) else Directions.RIGHT # defaults directions is right
+    self._agentSensations = copy(other._agentSensations) if isinstance(other, WumpusWorld) else [False, False, False, False, False] # sensations available to
     
-    if not other:
+    ''' in case other is a map to create a specific world
+        other = {
+          "wumpusPosition": (x,y),
+          "goldPosition": (x,y),
+          "pitPositions": [(x1,y1),(x2,y2),...]
+        }
+    '''
+    if other and not isinstance(other, WumpusWorld):
+      wumpusX, wumpusY = other['wumpusPosition']
+      self._wumpusPosition = (wumpusX, wumpusY)
+      self._rooms[wumpusX][wumpusY].hasWumpus = True
+      self.updateSensation(Sensations.STENCH, True, wumpusX, wumpusY)
+
+      goldX, goldY = other['goldPosition']
+      self._rooms[goldX][goldY].hasGold = True
+      self._rooms[goldX][goldY].sensations[Sensations.GLITTER] = True
+
+      for pit in other['pitPositions']:
+        pitX, pitY = pit
+        self._rooms[pitX][pitY].hasPit = True
+        self.updateSensation(Sensations.BREEZE, True, pitX, pitY)
+    elif not other:
       self.createWumpusWorld()
 
   def getRoom(self, i, j):
