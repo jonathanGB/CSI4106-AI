@@ -156,12 +156,11 @@ class WumpusAgent:
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
           print(routeProblem.allowed)
-          print(str(self.plan))
         elif not self.world.isWumpusDead and len(self.wumpusRooms) > 0:
           print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
-          self.plan.insert(len(self.plan) - 2, Actions.FIRE_ARROW)
+          self.plan.insert(len(self.plan) - 1, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
           print("Finding path to an unsafe room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.unsafeRooms, self.visited.union(self.unsafeRooms)))
@@ -311,7 +310,7 @@ class WumpusAgent:
 
 # start script here
 agent = WumpusAgent({
-  "wumpusPosition": (0,2),
+  "wumpusPosition": (0,1),
   "goldPosition": (1, 2),
   "pitPositions": [(2,0), (2,2), (3,3)]
 })

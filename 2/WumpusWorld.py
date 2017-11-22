@@ -55,14 +55,14 @@ class WumpusWorld:
 
   def __init__(self, other=None):
     self._size = 4
-    self._rooms = copy(other._rooms) if isinstance(other, WumpusWorld) else [[Room() for _ in range(self._size)] for _ in range(self._size)]
+    self._rooms = deepcopy(other._rooms) if isinstance(other, WumpusWorld) else [[Room() for _ in range(self._size)] for _ in range(self._size)]
 
     self._wumpusPosition = other._wumpusPosition if isinstance(other, WumpusWorld) else None
     self._agentDead = other._agentDead if isinstance(other, WumpusWorld) else False
     self._goldPickedUp = other._goldPickedUp if isinstance(other, WumpusWorld) else False
     self._agentPosition = other._agentPosition if isinstance(other, WumpusWorld) else (0,0) # position of the agent
     self.direction = other.direction if isinstance(other, WumpusWorld) else Directions.RIGHT # defaults directions is right
-    self._agentSensations = copy(other._agentSensations) if isinstance(other, WumpusWorld) else [False, False, False, False, False] # sensations available to
+    self._agentSensations = deepcopy(other._agentSensations) if isinstance(other, WumpusWorld) else [False, False, False, False, False] # sensations available to
 
     ''' in case other is a map to create a specific world
         other = {
@@ -85,6 +85,8 @@ class WumpusWorld:
         pitX, pitY = pit
         self._rooms[pitX][pitY].hasPit = True
         self.updateSensation(Sensations.BREEZE, True, pitX, pitY)
+
+      self._updateAgentSensations()
     elif not other:
       self.createWumpusWorld()
 
