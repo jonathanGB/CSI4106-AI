@@ -20,6 +20,7 @@ class WumpusAgent:
     self.payoff = 0
     self.moves = 0
     self.plan = []
+    self.verbose = verbose
 
     self.safeRooms = set() # set of tuples to store safe rooms we are able to reach
     self.wumpusRooms = set() # set of tuples to store rooms that may contain a wumpus
@@ -112,11 +113,11 @@ class WumpusAgent:
         self.removeLocationFromFringe((posX, posY))
 
         # add new reachable locations to the fringe
-        if verbose:
+        if self.verbose:
           print("Adding new reachable locations...")
         for location in self.getValidAdjacentLocations(posX, posY):
           if location not in self.visited:
-            if verbose:
+            if self.verbose:
               print(str(location))
             self.unsafeRooms.add(location)
 
@@ -156,27 +157,27 @@ class WumpusAgent:
         # If not, we try to get to unvisited room that may contain a wumpus
         # Last resort, we try to get to unvisited room that may contain a pit
         if len(self.safeRooms) > 0:
-          if verbose:
+          if self.verbose:
             print("Finding path to a safe room")
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
-          if verbose:
+          if self.verbose:
             print(routeProblem.allowed)
             print(str(self.plan))
         elif not self.world.isWumpusDead and len(self.wumpusRooms) > 0:
-          if verbose:
+          if self.verbose:
             print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
           self.plan.insert(len(self.plan) - 2, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
-          if verbose:
+          if self.verbose:
             print("Finding path to an unsafe room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
           break
-        if verbose:
+        if self.verbose:
           print(str(self.plan))
 
       else:
@@ -184,12 +185,12 @@ class WumpusAgent:
         self.moves += 1
     
       iteration += 1
-      if verbose:
+      if self.verbose:
         self.printWorld(iteration)
         self.printInfo()
       
 
-    if verbose:
+    if self.verbose:
       self.printResults(timeit.default_timer() - start)
 
   def printInfo(self):
@@ -256,7 +257,7 @@ class WumpusAgent:
       self.moves += 1
       lastAction = action
     
-    if verbose:
+    if self.verbose:
       self.printResults(timeit.default_timer() - start)
 
   def printResults(self, delta):
@@ -276,7 +277,7 @@ class WumpusAgent:
     return not result
 
   def astar_search(self, routeProblem):
-    if verbose:
+    if self.verbose:
       print('A* ------------------------------------')
     open_nodes = PriorityQueue(min, self.priority_function)
     visited = set() # used to keep track of visited nodes
@@ -324,37 +325,39 @@ class WumpusAgent:
 
 results = [0, 0, 0, 0]
 def simulation2500(id, verbose):
-  for i in range(2500):
+  for i in range(250):
     agent = WumpusAgent(None, verbose)
     agent.intelligentExploreWorld()
-    results[i] += agent.payoff
+    results[id] += agent.payoff
     print("{} finished iteration {} with payoff {}".format(id, i, agent.payoff))
     print(results)
 
-# start script here
-verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
 
-p1 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
-p2 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
-p3 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
-p4 = multiprocessing.Process(target=simulation2500, args=(4, verbose))
-p1.start()
-p2.start()
-p3.start()
-p4.start()
-p1.join()
-p2.join()
-p3.join()
-p4.join()
+if __name__ == "__main__":
+  # start script here
+  verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
 
-print(results)
-averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 10000
-print("Average payoff is {}".format(averagePayoff))
+  p1 = multiprocessing.Process(target=simulation2500, args=(0, verbose))
+  p2 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
+  p3 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
+  p4 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
+  p1.start()
+  p2.start()
+  p3.start()
+  p4.start()
+  p1.join()
+  p2.join()
+  p3.join()
+  p4.join()
 
-'''agent = WumpusAgent({
-  "wumpusPosition": (0,2),
-  "goldPosition": (1, 2),
-  "pitPositions": [(2,0), (2,2), (3,3)]
-}, verbose)
-agent.intelligentExploreWorld()
-'''
+  print(results)
+  averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
+  print("Average payoff is {}".format(averagePayoff))
+
+  '''agent = WumpusAgent({
+    "wumpusPosition": (0,2),
+    "goldPosition": (1, 2),
+    "pitPositions": [(2,0), (2,2), (3,3)]
+  }, verbose)
+  agent.intelligentExploreWorld()
+  '''
