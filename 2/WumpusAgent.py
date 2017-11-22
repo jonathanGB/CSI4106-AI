@@ -370,9 +370,9 @@ def simulation2500(id, verbose):
   # print("Average payoff is {}".format(averagePayoff))
 
 agent = WumpusAgent({
-    "wumpusPosition": (2,0),
-    "goldPosition": (1, 3),
-    "pitPositions": [(0,2), (1,2)]
+    "wumpusPosition": (0,2),
+    "goldPosition": (1, 2),
+    "pitPositions": [(2,0), (2,2), (3,3)]
   }, True)
 agent.intelligentExploreWorld()
 
