@@ -208,9 +208,6 @@ class WumpusWorld:
       return 1000
 
     if action == Actions.FIRE_ARROW:
-      if WumpusWorld.isWumpusDead:
-        return -10
-
       # get vector from agent to wumpus
       wumpusDirectionX, wumpusDirectionY = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
       # vector norm (length)
@@ -224,7 +221,6 @@ class WumpusWorld:
       if wumpusDirectionUnit == arrowDirectionUnit:
         wumpusX, wumpusY = self._wumpusPosition
         self._rooms[wumpusX][wumpusY].hasWumpus = False
-        WumpusWorld.isWumpusDead = True
         self.updateSensation(Sensations.STENCH, False, wumpusX, wumpusY)
 
 
@@ -243,4 +239,3 @@ class WumpusWorld:
     # for pathfinding, we only need to know the agent's position and direction
     return str(self._agentPosition) + str(self.direction)
 
-WumpusWorld.isWumpusDead = False

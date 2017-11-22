@@ -61,8 +61,8 @@ class WumpusAgent:
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.STENCH] | '<=>' | self.getValidAdjacentRoomExpressions(i,j,self.wumpuss))
         # glitter
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.GLITTER] | '<=>' | self.golds[i][j])
-        # scream means no stench
-        self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.sensations[i][j][Sensations.STENCH])
+        # scream means no wumpus
+        self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.wumpuss[i][j])
     self.wumpus_kb.tell('~Pi00')
     self.wumpus_kb.tell('~Go00')
 
@@ -156,7 +156,7 @@ class WumpusAgent:
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
           print(routeProblem.allowed)
-        elif not self.world.isWumpusDead and len(self.wumpusRooms) > 0:
+        elif len(self.wumpusRooms) > 0:
           print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
@@ -170,12 +170,13 @@ class WumpusAgent:
         print(str(self.plan))
 
       else:
-        self.payoff += self.world.applyAction(self.plan.pop(0))
+        action = self.plan.pop(0)
+        print(str(action))
+        self.payoff += self.world.applyAction(action)
         self.moves += 1
     
       iteration += 1
       self.printWorld(iteration)
-      self.printInfo()
       
 
 
