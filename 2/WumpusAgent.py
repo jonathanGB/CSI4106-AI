@@ -330,6 +330,9 @@ results = [0, 0, 0, 0]
 def simulation2500(id, verbose):
   for i in range(250):
     agent = WumpusAgent(None, verbose)
+    while not agent.world.isValidWorld():
+      agent = WumpusAgent(None, verbose)
+
     agent.intelligentExploreWorld()
     agent.payoff += -1000 if agent.world.isAgentDead() else 0
     results[id] += agent.payoff
