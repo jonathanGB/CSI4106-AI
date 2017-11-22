@@ -89,6 +89,8 @@ class WumpusAgent:
     posX, posY = self.world.getAgentPosition()
     for perception, perceptionValue in enumerate(percept):
       prefix = '' if perceptionValue else '~' 
+      prefix2 = '~' if perceptionValue else ''
+      self.wumpus_kb.retract(expr(prefix2 + str(self.sensations[posX][posY][perception])))
       self.wumpus_kb.tell(expr(prefix + str(self.sensations[posX][posY][perception])))  
 
   def intelligentExploreWorld(self):
@@ -100,7 +102,6 @@ class WumpusAgent:
         posX, posY = self.world.getAgentPosition()
         percept = self.world.getAgentSensations()
         self.tellSensations(percept)
-        
         # check if we are on gold
         if percept[Sensations.GLITTER]:
           self.payoff += self.world.applyAction(Actions.GRAB_OBJECT)
@@ -187,6 +188,8 @@ class WumpusAgent:
           print(str(action))
         self.payoff += self.world.applyAction(action)
         self.moves += 1
+        percept = self.world.getAgentSensations()
+        self.tellSensations(percept)
     
       iteration += 1
       if self.verbose:
@@ -340,31 +343,31 @@ def simulation2500(id, verbose):
     print(results)
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
   # start script here
-  verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
+  # verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
 
-  p1 = multiprocessing.Process(target=simulation2500, args=(0, verbose))
-  p2 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
-  p3 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
-  p4 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
-  p1.start()
-  p2.start()
-  p3.start()
-  p4.start()
-  p1.join()
-  p2.join()
-  p3.join()
-  p4.join()
+  # p1 = multiprocessing.Process(target=simulation2500, args=(0, verbose))
+  # p2 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
+  # p3 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
+  # p4 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
+  # p1.start()
+  # p2.start()
+  # p3.start()
+  # p4.start()
+  # p1.join()
+  # p2.join()
+  # p3.join()
+  # p4.join()
 
-  print(results)
-  averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
-  print("Average payoff is {}".format(averagePayoff))
+  # print(results)
+  # averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
+  # print("Average payoff is {}".format(averagePayoff))
 
-  '''agent = WumpusAgent({
+agent = WumpusAgent({
     "wumpusPosition": (0,2),
     "goldPosition": (1, 2),
     "pitPositions": [(2,0), (2,2), (3,3)]
-  }, verbose)
-  agent.intelligentExploreWorld()
-  '''
+  }, True)
+agent.intelligentExploreWorld()
+
