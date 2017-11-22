@@ -154,7 +154,6 @@ class WumpusAgent:
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
           print(routeProblem.allowed)
-          print(str(self.plan))
         elif len(self.wumpusRooms) > 0:
           print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
@@ -166,6 +165,7 @@ class WumpusAgent:
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
           break
+        print(str(self.plan))
 
       else:
         self.payoff += self.world.applyAction(self.plan.pop(0))
