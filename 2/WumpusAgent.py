@@ -110,8 +110,10 @@ class WumpusAgent:
         self.removeLocationFromFringe((posX, posY))
 
         # add new reachable locations to the fringe
+        print("Adding new reachable locations...")
         for location in self.getValidAdjacentLocations(posX, posY):
           if location not in self.visited:
+            print(str(location))
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about

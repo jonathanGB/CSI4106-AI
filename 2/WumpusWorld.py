@@ -231,6 +231,9 @@ class WumpusWorld:
           for j in range(self._size):
             self._rooms[i][j].sensations[Sensations.SCREAM] = True
 
+        # remove the wumpus
+        self._wumpusPosition = (-1,-1)
+
       return -10
 
   # returns a unique string based on current state of the world
