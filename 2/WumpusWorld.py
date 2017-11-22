@@ -206,7 +206,6 @@ class WumpusWorld:
       return 1000
 
     if action == Actions.FIRE_ARROW:
-      print ("Fired arrow")
       # get vector from agent to wumpus
       wumpusDirectionX, wumpusDirectionY = tuple(map(lambda x, y: x - y, self._wumpusPosition, self._agentPosition))
       # vector norm (length)
