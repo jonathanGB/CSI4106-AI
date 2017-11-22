@@ -166,6 +166,7 @@ class WumpusAgent:
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
           break
+        print(str(self.plan))
 
       else:
         self.payoff += self.world.applyAction(self.plan.pop(0))
@@ -308,8 +309,8 @@ class WumpusAgent:
 
 # start script here
 agent = WumpusAgent({
-  "wumpusPosition": (1, 0),
-  "goldPosition": (0, 3),
-  "pitPositions": []
+  "wumpusPosition": (0,2),
+  "goldPosition": (1, 2),
+  "pitPositions": [(2,0), (2,2), (3,3)]
 })
 agent.intelligentExploreWorld()
