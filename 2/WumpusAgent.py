@@ -291,9 +291,9 @@ class WumpusAgent:
     print("Iteration {}:".format(iteration))
     dir = self.world.direction
     dirStr = '←' if dir == Directions.LEFT else '↑' if dir == Directions.UP else '→' if dir == Directions.RIGHT else '↓'
-    for i in reversed(range(self.world.getSize())):
-      for j in range(self.world.getSize()):
-        if j == 0:
+    for j in reversed(range(self.world.getSize())):
+      for i in range(self.world.getSize()):
+        if i == 0:
           print("\n --------------- \n|", end='')
           
         currentRoom = self.world.getRoom(i, j)
