@@ -4,6 +4,8 @@ from WumpusWorld import *
 from RouteProblem import *
 import timeit
 import random
+import sys
+import multiprocessing
 
 class ActionPriority:
   GRAB = 0
@@ -12,12 +14,13 @@ class ActionPriority:
   NOT_SAFE = 3
 
 class WumpusAgent:
-  def __init__(self, world=None):
+  def __init__(self, world=None, verbose=False):
     self.world = WumpusWorld(world)
     self.wumpus_kb = PropKB()
     self.payoff = 0
     self.moves = 0
     self.plan = []
+    self.verbose = verbose
 
     self.safeRooms = set() # set of tuples to store safe rooms we are able to reach
     self.wumpusRooms = set() # set of tuples to store rooms that may contain a wumpus
@@ -108,10 +111,12 @@ class WumpusAgent:
         self.removeLocationFromFringe((posX, posY))
 
         # add new reachable locations to the fringe
-        print("Adding new reachable locations...")
+        if self.verbose:
+          print("Adding new reachable locations...")
         for location in self.getValidAdjacentLocations(posX, posY):
           if location not in self.visited:
-            print(str(location))
+            if self.verbose:
+              print(str(location))
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
@@ -150,35 +155,43 @@ class WumpusAgent:
         # If not, we try to get to unvisited room that may contain a wumpus
         # Last resort, we try to get to unvisited room that may contain a pit
         if len(self.safeRooms) > 0:
-          print("Finding path to a safe room")
+          if self.verbose:
+            print("Finding path to a safe room")
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
-          print(routeProblem.allowed)
+          if self.verbose:
+            print(routeProblem.allowed)
         elif len(self.wumpusRooms) > 0:
-          print("Finding path to a wumpus room")
+          if self.verbose:
+            print("Finding path to a wumpus room")
+
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
           self.plan.insert(len(self.plan) - 1, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
-          print("Finding path to an unsafe room")
+          if self.verbose:
+            print("Finding path to an unsafe room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
           break
-        print(str(self.plan))
+        if self.verbose:
+          print(str(self.plan))
 
       else:
         action = self.plan.pop(0)
-        print(str(action))
+        if self.verbose:
+          print(str(action))
         self.payoff += self.world.applyAction(action)
         self.moves += 1
     
       iteration += 1
-      self.printWorld(iteration)
+      if self.verbose:
+        self.printWorld(iteration)
       
 
-
-    self.printResults(timeit.default_timer() - start)
+    if self.verbose:
+      self.printResults(timeit.default_timer() - start)
 
   def printInfo(self):
     print("Current location: " + str(self.world.getAgentPosition()))
@@ -243,8 +256,9 @@ class WumpusAgent:
       self.payoff += self.world.applyAction(action)
       self.moves += 1
       lastAction = action
-
-    self.printResults(timeit.default_timer() - start)
+    
+    if self.verbose:
+      self.printResults(timeit.default_timer() - start)
 
   def printResults(self, delta):
     if self.world.isAgentDead():
@@ -263,7 +277,8 @@ class WumpusAgent:
     return not result
 
   def astar_search(self, routeProblem):
-    print('A* ------------------------------------')
+    if self.verbose:
+      print('A* ------------------------------------')
     open_nodes = PriorityQueue(min, self.priority_function)
     visited = set() # used to keep track of visited nodes
     open_nodes.append(routeProblem)
@@ -307,10 +322,43 @@ class WumpusAgent:
     sensations = self.world.getAgentSensations()
     print("Breeze: {}, Stench: {}, Glitter: {}, Bump: {}, Scream: {}\n\n".format(sensations[0], sensations[1], sensations[2], sensations[3], sensations[4]))
 
-# start script here
-agent = WumpusAgent({
-  "wumpusPosition": (0,1),
-  "goldPosition": (1, 2),
-  "pitPositions": [(2,0), (2,2), (3,3)]
-})
-agent.intelligentExploreWorld()
+
+results = [0, 0, 0, 0]
+def simulation2500(id, verbose):
+  for i in range(250):
+    agent = WumpusAgent(None, verbose)
+    agent.intelligentExploreWorld()
+    agent.payoff += -1000 if agent.world.isAgentDead() else 0
+    results[id] += agent.payoff
+    print("{} finished iteration {} with payoff {}".format(id, i, agent.payoff))
+    print(results)
+
+
+if __name__ == "__main__":
+  # start script here
+  verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
+
+  p1 = multiprocessing.Process(target=simulation2500, args=(0, verbose))
+  p2 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
+  p3 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
+  p4 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
+  p1.start()
+  p2.start()
+  p3.start()
+  p4.start()
+  p1.join()
+  p2.join()
+  p3.join()
+  p4.join()
+
+  print(results)
+  averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
+  print("Average payoff is {}".format(averagePayoff))
+
+  '''agent = WumpusAgent({
+    "wumpusPosition": (0,2),
+    "goldPosition": (1, 2),
+    "pitPositions": [(2,0), (2,2), (3,3)]
+  }, verbose)
+  agent.intelligentExploreWorld()
+  '''
