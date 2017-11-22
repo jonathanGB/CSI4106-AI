@@ -118,7 +118,12 @@ class WumpusAgent:
           if location not in self.visited:
             if self.verbose:
               print(str(location))
-            self.unsafeRooms.add(location)
+            if percept[Sensations.BREEZE]:
+              self.unsafeRooms.add(location)
+            elif percept[Sensations.STENCH]:
+              self.wumpusRooms.add(location)
+            else:
+              self.safeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
         tempUnsafe = self.unsafeRooms.copy()
@@ -365,9 +370,9 @@ def simulation2500(id, verbose):
   # print("Average payoff is {}".format(averagePayoff))
 
 agent = WumpusAgent({
-    "wumpusPosition": (0,2),
-    "goldPosition": (1, 2),
-    "pitPositions": [(2,0), (2,2), (3,3)]
+    "wumpusPosition": (2,0),
+    "goldPosition": (1, 3),
+    "pitPositions": [(0,2), (1,2)]
   }, True)
 agent.intelligentExploreWorld()
 
