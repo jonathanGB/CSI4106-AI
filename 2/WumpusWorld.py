@@ -143,6 +143,38 @@ class WumpusWorld:
   def getSize(self):
     return self._size
 
+  # explore the world to make sure it is valid (there is a path to the gold)
+  # uses BFS with graph-search
+  def isValidWorld(self):
+    visited = set()
+    toVisit = [(0,0)]
+    
+    while len(toVisit) > 0:
+      currX, currY = toVisit.pop(0)
+
+      if self._rooms[currX][currY].hasGold:
+        return True
+
+      visited.add("{}{}".format(currX, currY))
+
+      if currX + 1 < self._size and not self._rooms[currX+1][currY].hasPit:
+        if "{}{}".format(currX+1, currY) not in visited:
+          toVisit.append((currX+1, currY))
+
+      if currY + 1 < self._size and not self._rooms[currX][currY+1].hasPit:
+        if "{}{}".format(currX, currY+1) not in visited:
+          toVisit.append((currX, currY+1))
+
+      if currX - 1 >= 0 and not self._rooms[currX-1][currY].hasPit:
+        if "{}{}".format(currX-1, currY) not in visited:
+          toVisit.append((currX-1, currY))
+
+      if currY - 1 >= 0 and not self._rooms[currX][currY-1].hasPit:
+        if "{}{}".format(currX, currY-1) not in visited:
+          toVisit.append((currX, currY-1))
+    
+    return False
+
   # updates sensations surrounding tile (i,j)
   def updateSensation(self, sensation, isSensed, i, j):
     if i - 1 >= 0:
