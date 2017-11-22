@@ -4,6 +4,7 @@ from WumpusWorld import *
 from RouteProblem import *
 import timeit
 import random
+import sys
 
 class ActionPriority:
   GRAB = 0
@@ -12,7 +13,7 @@ class ActionPriority:
   NOT_SAFE = 3
 
 class WumpusAgent:
-  def __init__(self, world=None):
+  def __init__(self, world=None, verbose=False):
     self.world = WumpusWorld(world)
     self.wumpus_kb = PropKB()
     self.payoff = 0
@@ -110,10 +111,12 @@ class WumpusAgent:
         self.removeLocationFromFringe((posX, posY))
 
         # add new reachable locations to the fringe
-        print("Adding new reachable locations...")
+        if verbose:
+          print("Adding new reachable locations...")
         for location in self.getValidAdjacentLocations(posX, posY):
           if location not in self.visited:
-            print(str(location))
+            if verbose:
+              print(str(location))
             self.unsafeRooms.add(location)
 
         # recheck safety of fringe locations we were not sure about
@@ -152,35 +155,41 @@ class WumpusAgent:
         # If not, we try to get to unvisited room that may contain a wumpus
         # Last resort, we try to get to unvisited room that may contain a pit
         if len(self.safeRooms) > 0:
-          print("Finding path to a safe room")
+          if verbose:
+            print("Finding path to a safe room")
           routeProblem = RouteProblem(WumpusWorld(self.world), self.safeRooms, self.visited.union(self.safeRooms))
           self.plan = self.astar_search(routeProblem)
-          print(routeProblem.allowed)
-          print(str(self.plan))
+          if verbose:
+            print(routeProblem.allowed)
+            print(str(self.plan))
         elif not self.world.isWumpusDead and len(self.wumpusRooms) > 0:
-          print("Finding path to a wumpus room")
+          if verbose:
+            print("Finding path to a wumpus room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.wumpusRooms, self.visited.union(self.wumpusRooms)))
           # before moving into the tile that might have a wumpus, take a shot
           self.plan.insert(len(self.plan) - 2, Actions.FIRE_ARROW)
         elif len(self.unsafeRooms) > 0:
-          print("Finding path to an unsafe room")
+          if verbose:
+            print("Finding path to an unsafe room")
           self.plan = self.astar_search(RouteProblem(WumpusWorld(self.world), self.unsafeRooms, self.visited.union(self.unsafeRooms)))
         else:
           # We are surrounded by walls and/or pits. Puzzle is not solvable.
           break
-        print(str(self.plan))
+        if verbose:
+          print(str(self.plan))
 
       else:
         self.payoff += self.world.applyAction(self.plan.pop(0))
         self.moves += 1
     
       iteration += 1
-      self.printWorld(iteration)
-      self.printInfo()
+      if verbose:
+        self.printWorld(iteration)
+        self.printInfo()
       
 
-
-    self.printResults(timeit.default_timer() - start)
+    if verbose:
+      self.printResults(timeit.default_timer() - start)
 
   def printInfo(self):
     print("Current location: " + str(self.world.getAgentPosition()))
@@ -245,8 +254,9 @@ class WumpusAgent:
       self.payoff += self.world.applyAction(action)
       self.moves += 1
       lastAction = action
-
-    self.printResults(timeit.default_timer() - start)
+    
+    if verbose:
+      self.printResults(timeit.default_timer() - start)
 
   def printResults(self, delta):
     if self.world.isAgentDead():
@@ -265,7 +275,8 @@ class WumpusAgent:
     return not result
 
   def astar_search(self, routeProblem):
-    print('A* ------------------------------------')
+    if verbose:
+      print('A* ------------------------------------')
     open_nodes = PriorityQueue(min, self.priority_function)
     visited = set() # used to keep track of visited nodes
     open_nodes.append(routeProblem)
@@ -309,10 +320,13 @@ class WumpusAgent:
     sensations = self.world.getAgentSensations()
     print("Breeze: {}, Stench: {}, Glitter: {}, Bump: {}, Scream: {}\n\n".format(sensations[0], sensations[1], sensations[2], sensations[3], sensations[4]))
 
+
+
 # start script here
+verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
 agent = WumpusAgent({
   "wumpusPosition": (0,2),
   "goldPosition": (1, 2),
   "pitPositions": [(2,0), (2,2), (3,3)]
-})
+}, verbose)
 agent.intelligentExploreWorld()
