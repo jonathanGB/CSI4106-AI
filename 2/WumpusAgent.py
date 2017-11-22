@@ -61,8 +61,6 @@ class WumpusAgent:
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.STENCH] | '<=>' | self.getValidAdjacentRoomExpressions(i,j,self.wumpuss))
         # glitter
         self.wumpus_kb.tell(self.sensations[i][j][Sensations.GLITTER] | '<=>' | self.golds[i][j])
-        # scream means no wumpus
-        self.wumpus_kb.tell(self.sensations[i][j][Sensations.SCREAM] | '==>' | ~self.wumpuss[i][j])
     self.wumpus_kb.tell('~Pi00')
     self.wumpus_kb.tell('~Go00')
 
