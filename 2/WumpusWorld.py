@@ -9,10 +9,10 @@ class Directions:
   DOWN = 2
   LEFT = 3
   DIRECTION_VECTORS = {
-    0: (0,1), #Up
-    1: (1,0), #Right
-    2: (0,-1),#Down
-    3: (-1,0) #Left
+    0: (1,0), #Up
+    1: (0,1), #Right
+    2: (-1,0),#Down
+    3: (0,-1) #Left
   }
 
 class Actions(Enum):
