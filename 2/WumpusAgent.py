@@ -5,6 +5,7 @@ from RouteProblem import *
 import timeit
 import random
 import sys
+import multiprocessing
 
 class ActionPriority:
   GRAB = 0
@@ -321,12 +322,39 @@ class WumpusAgent:
     print("Breeze: {}, Stench: {}, Glitter: {}, Bump: {}, Scream: {}\n\n".format(sensations[0], sensations[1], sensations[2], sensations[3], sensations[4]))
 
 
+results = [0, 0, 0, 0]
+def simulation2500(id, verbose):
+  for i in range(2500):
+    agent = WumpusAgent(None, verbose)
+    agent.intelligentExploreWorld()
+    results[i] += agent.payoff
+    print("{} finished iteration {} with payoff {}".format(id, i, agent.payoff))
+    print(results)
 
 # start script here
 verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
-agent = WumpusAgent({
+
+p1 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
+p2 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
+p3 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
+p4 = multiprocessing.Process(target=simulation2500, args=(4, verbose))
+p1.start()
+p2.start()
+p3.start()
+p4.start()
+p1.join()
+p2.join()
+p3.join()
+p4.join()
+
+print(results)
+averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 10000
+print("Average payoff is {}".format(averagePayoff))
+
+'''agent = WumpusAgent({
   "wumpusPosition": (0,2),
   "goldPosition": (1, 2),
   "pitPositions": [(2,0), (2,2), (3,3)]
 }, verbose)
 agent.intelligentExploreWorld()
+'''
