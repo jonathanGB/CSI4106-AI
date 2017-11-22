@@ -133,7 +133,8 @@ class WumpusAgent:
           # if the location contains a pit, remove it from consideration
           if self.checkIfTrue(self.pits[locationX][locationY]):
             self.unsafeRooms.discard((locationX, locationY))
-            print(str(locationX) + "," + str(locationY) + " contains a pit. Eliminated location from consideration.")
+            if self.verbose:
+              print(str(locationX) + "," + str(locationY) + " contains a pit. Eliminated location from consideration.")
           
           # check if there is no longer any chance that the location has a pit
           elif self.checkIfTrue(~self.pits[locationX][locationY]):
@@ -367,27 +368,27 @@ def simulation2500(id, verbose):
     print(results)
 
 
-#if __name__ == "__main__":
-  # start script here
-  # verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
+if __name__ == "__main__":
+  #start script here
+  verbose = True if len(sys.argv) > 1 and sys.argv[1] == "-v" else False
 
-  # p1 = multiprocessing.Process(target=simulation2500, args=(0, verbose))
-  # p2 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
-  # p3 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
-  # p4 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
-  # p1.start()
-  # p2.start()
-  # p3.start()
-  # p4.start()
-  # p1.join()
-  # p2.join()
-  # p3.join()
-  # p4.join()
+  p1 = multiprocessing.Process(target=simulation2500, args=(0, verbose))
+  p2 = multiprocessing.Process(target=simulation2500, args=(1, verbose))
+  p3 = multiprocessing.Process(target=simulation2500, args=(2, verbose))
+  p4 = multiprocessing.Process(target=simulation2500, args=(3, verbose))
+  p1.start()
+  p2.start()
+  p3.start()
+  p4.start()
+  p1.join()
+  p2.join()
+  p3.join()
+  p4.join()
 
-  # print(results)
-  # averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
-  # print("Average payoff is {}".format(averagePayoff))
+  print(results)
+  averagePayoff = (results[0] + results[1] + results[2] + results[3]) / 1000
+  print("Average payoff is {}".format(averagePayoff))
 
-agent = WumpusAgent(None, True)
-agent.intelligentExploreWorld()
+# agent = WumpusAgent(None, True)
+# agent.intelligentExploreWorld()
 
