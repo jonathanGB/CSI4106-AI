@@ -15,3 +15,11 @@
 * Ibk: 59.25%
 * NaiveBayes: 74.2%
 * SMO: 78.95%
+
+
+### Experiment c
+* ZeroR: 50%
+* J48: 68.2%
+* IBk: 50.4%
+* NaiveBayes: 63.1%
+* SMO: 91.8%
